@@ -1,0 +1,8 @@
+image: docker.imajing:5000/imajing-languagefile-validation:1.0.0
+stages:
+        - validate
+              
+validate:
+        stage: validate
+        script:
+        - /opt/validate_json_language_files.sh "locale-*.js"

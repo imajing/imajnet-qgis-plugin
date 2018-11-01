@@ -1,0 +1,356 @@
+html: {
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif!important;
+    background: #eeeeee url(images/ui-bg_highlight-soft_100_eeeeee_1x100.png) 50% top repeat-x;
+}
+
+#imajnetContainer {
+/* 	position: absolute; */
+/* 	top: 100px; */
+/* 	left: 10px; */
+/* 	z-index: 9; */
+	/* 	overflow: inherit !important; */
+	width: 100%;
+}
+
+#imajnetButtons {
+	/* position: absolute; */
+	top: 10px;
+	left: 50px;
+/* 	z-index: 99999; */
+}
+
+#imajnetActiveButtons {
+	display: none;
+}
+
+#map {
+	
+}
+
+.customControls {
+	position: absolute;
+	bottom: 10px;
+	left: 10px;
+}
+
+.customControls button {
+	width: auto;
+	padding: 0 10px;
+	display: inline-block;
+}
+
+.customControls button.active {
+	text-decoration: none;
+	background-color: rgba(0, 60, 136, .7);
+}
+
+#greenHandler {
+	width: 15px;
+	height: 15px;
+	top: 100%;
+	margin-top: -20px;
+	left: 100%;
+	margin-left: -20px;
+	background-image: url('../img/resize.png');
+	background-repeat: no-repeat;
+	position: absolute;
+	z-index: 9;
+	cursor: pointer;
+	display: none;
+}
+
+#popupNews {
+/* 	position: fixed;
+	top: 10px;
+	right: 10px; */
+	width: 530px;
+	height: 500px;
+}
+
+/*css for Imajnet library*/
+#popupPhotogrammetryClipboard {
+/* 	position: fixed;
+	top: 10px;
+	right: 10px; */
+	background: rgb(58, 116, 185);
+	background: rgba(58, 116, 185, 0.75);
+}
+
+#popupPhotogrammetryClipboardExport {
+}
+
+#searchLRSContainer {
+/* 	position: fixed;
+	top: 10px;
+	right: 10px; */
+	color: #298CFF;
+	font-size: 14px;
+}
+
+.searchLRSDialogContentHeader{
+	margin: 10px 0 10px 0;
+}
+
+.searchLRSDialogContentBodyBorder {
+	margin: 5px;
+	padding: 5px;
+	margin-left: 15px;
+}
+
+.searchLRSDialogContentBody {
+	margin-top: 0;
+}
+
+.searchLRSDialogContentBody .dialogContentTitle {
+	display: none;
+}
+
+.searchLRSItemName {
+	font-size: 14px;
+}
+
+.imajnetItem {
+    color: #333;
+    z-index: 9999;
+    background: #eeeeee url(images/ui-bg_highlight-soft_100_eeeeee_1x100.png) 50% top repeat-x;
+}
+
+.imajnetItem span.ui-combobox a span.ui-icon {
+    background-image: url('../ImajnetLib/img/selectArrow.png');
+    background-position: center;
+}
+
+.dialogWhite50, #workspaces .dynatree-container, #metadataContainer .dynatree-container {
+    background-color: rgba(242, 242, 242, 0.5);
+    border: 1px solid #DBDCD8;
+}
+
+.dialogButtonsContainer {
+    /* margin: 10px 10px 15px 0; */
+    margin: 10px 10px 10px 15px;
+}
+
+.dialogContentTitle {
+    /* font-family: OpenSansSemibold; */
+    font-weight: bold;
+    /* color: #298CFF; */
+    margin-left: 20px;
+}
+
+#notificationLoginContainer.notification {
+	display: block;
+	right: auto;
+	top: 50%;
+	left: 50%;
+	width: auto;
+	margin-left: -225px;
+	margin-top: -120px;
+}
+
+#notificationLoginInnerContainer {
+	height: auto;
+}
+
+/* customize tabs */
+
+.ui-widget-header {
+	background: none;
+	border: none;
+	font-size: 0.9em;
+	border: none;
+	padding: 0;
+}
+
+.ui-tabs .ui-tabs-nav {
+	border-radius: 0;
+}
+
+.ui-tabs .ui-tabs-nav li a {
+	padding: 5px;
+}
+
+.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited {
+	color: #2683ef;
+}
+
+.ui-tabs .ui-tabs-panel {
+	padding: 0;
+	overflow-x: hidden;
+	position: relative;
+}
+
+.ui-tabs .ui-tabs-nav li.ui-tabs-active a {
+	color: #333;
+	font-weight: bold;
+}
+
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+	color: #2683ef;
+	border-radius: 4px 4px 0 0;
+	border-top: 1px solid #ccc!important;
+	border-bottom: 0;
+}
+
+.vertical .ui-state-default, .vertical .ui-widget-content .ui-state-default, .vertical .ui-widget-header .ui-state-default {
+	border-top: 0!important;
+	border-radius: 0 0 4px 4px;
+	border-bottom: 1px solid #ccc!important;
+}
+
+/* lrs tab */
+.searchLRSDiv {
+	width: auto;
+}
+
+.searchLRSItemName {
+	width: 150px;
+	font-weight: bold;
+}
+
+/* clipboard tab */
+
+.imajnetClipboardItem {
+	width: auto;
+	position: relative;
+	height: 40px;
+	overflow: auto;
+}
+
+.imajnetClipboardComment {
+	float: none!important;
+	position:absolute;
+	left: 40px;
+	right: 120px;
+}
+
+.imajnetClipboardComment > .imajnetClipboardCommentContainer {
+	width: auto!important;
+	height: 40px;
+}
+
+.imajnetClipboardItemImage img {
+	width: 42px!important;
+	height: 40px!important;
+}
+
+input[type=button].dialogButton, input[type=submit].dialogButton {
+    float: right;
+    margin-right: 30px;
+    color: #FFFFFF;
+    background-color: rgb(74, 158, 255);
+    background-position: left;
+    background-repeat: no-repeat;
+    height: 30px;
+    line-height: 30px;
+    border: none;
+    padding: 0 15px 1px 30px;
+    cursor: pointer;
+    /* background-image: url(../ImajnetLib/img/buttons/BTN-NO_IMAGE.PNG?ver=1); */
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+
+input[type=button]:hover, input[type=submit]:hover {
+    -moz-box-shadow: 2px 2px 3px #3A74B9;
+    -webkit-box-shadow: 2px 2px 3px #3A74B9;
+    box-shadow: 2px 2px 3px #3A74B9;
+}
+
+/* ORIZONTAL LAYOUT */
+.orizontal #imajnetContainer,
+.orizontal #imajnetTabs {
+	float:left;
+}
+
+.orizontal #imajnetTabs {
+	margin-left: 5px;
+	padding: 0;
+}
+
+.vertical .imajnetAutocomplete {
+	max-height: 150px!important;
+}
+
+.newsItemContainer {
+	width: auto;
+}
+
+#clipboardContainerContent {
+	position: absolute;
+	width: 100%;
+	top: 0;
+	bottom: 40px;
+	overflow-y: scroll;
+}
+
+#clipboardContainer {
+	height: 98%;
+	position: relative;
+}
+
+#popupImajnetClipboardButtonsContainer {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+}
+
+#notificationLoginRememberMe {
+	display: none;
+}
+
+.imajnetLoginItem input {
+	width: 230px;
+}
+
+.ui-dialog.ui-widget {
+	z-index: 9999!important;
+}
+
+.ui-dialog-titlebar-close {
+	background: rgb(74, 158, 255);
+}
+
+/* .ui-combobox { */
+/* 	position: relative !important; */
+/* 	display: inline-block !important; */
+/* } */
+
+/* .ui-combobox-input { */
+/* 	width: 145px; */
+/* } */
+
+/* .ui-combobox-toggle { */
+/* 	position: absolute !important; */
+/* 	top: 0 !important; */
+/* 	bottom: 0 !important; */
+/* 	margin-left: -1px !important; */
+/* 	padding: 0 !important; */
+/* 	/* adjust styles for IE 6/7 */
+*
+/
+/* 	*height: 1.7em !important; */
+/* 	*top: 0.1em !important; */
+/* } */
+
+/* .ui-autocomplete { */
+/* 	max-height: 300px !important; */
+/* 	overflow-x: hidden !important; */
+/* 	overflow-y: auto !important; */
+/* } */
+
+/* .greenBorder { */
+/* 	border: 1px solid rgb(58, 116, 185); */
+/* } */
+/*End css for Imajnet library*/

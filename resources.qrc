@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/plugins/imajnet-qgis-plugin/" >
+        <file>resources/img/icon.png</file>
+        <file>resources/img/closestImageMode.png</file>
+        <file>resources/img/clickMode.png</file>
+        <file>resources/img/debug.png</file>
+        <file>resources/img/about.png</file>
+        <file>resources/img/logout.png</file>
+        <file>resources/img/imajnetLogoMediumBlue.png</file>
+        <file>resources/img/imajingLogo.png</file>
+        <file>resources/img/help.png</file>
+    </qresource>
+</RCC>

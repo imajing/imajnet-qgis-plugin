@@ -1,0 +1,39 @@
+# This file contains metadata for your plugin. Since 
+# version 2.0 of QGIS this is the proper way to supply 
+# information about a plugin. The old method of 
+# embedding metadata in __init__.py will 
+# is no longer supported since version 2.0.
+
+# This file should be included when you package your plugin.# Mandatory items:
+
+[general]
+name=Imajnet QGIS 
+qgisMinimumVersion=3.0
+description=Imajnet QGIS
+version=V.X
+author=Imajing sas
+email=support@imajnet.net
+
+about=imajnet® is a safe and powerful featured web service giving access to nationwide surveys performed with imajbox® mobile mapping system, for any entity within an organization. Flexible, imajnet® is provided with extensions and SDKs to be integrated in ESRI suite and any other third party GIS web or desktop application. More than a hosting platform for up-to-date field geo-localized images, imajnet® provides a set of tools to extract GIS data from surveys, search for places in geographical or linear coordinates, project vector layers in images, compare surveys over time and make 3D measurements.
+
+tracker=https://gitlab.imajnet.net/imajnet/imajnet-qgis-plugin/issues
+repository=https://gitlab.imajnet.net/imajnet/imajnet-qgis-plugin
+# End of mandatory metadata
+
+# Recommended items:
+
+# Uncomment the following line and add your changelog:
+# changelog=
+
+# Tags are comma separated with spaces allowed
+tags=imajnet, mobile mapping, imajbox, imajing, imajview, image, street view 
+
+homepage=http://imajnet.net
+category=Web
+icon=resources/img/icon.png
+# experimental flag
+experimental=False
+
+# deprecated flag (applies to the whole plugin, not just a single version)
+deprecated=False
+

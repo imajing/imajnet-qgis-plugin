@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html style="width: 100%; height: 100%;">
+<head>
+
+<title>Imajnet Qgis Plugin</title>
+
+
+<link rel="stylesheet"
+	href="ImajnetLib/lib/jquery-ui-1.9.0.custom/css/ui-lightness/jquery-ui-1.9.0.custom.css" />
+<link rel="stylesheet"
+	href="ImajnetLib/lib/loadmask/jquery.loadmask.css" />
+<link rel="stylesheet"
+	href="ImajnetLib/lib/jquery-notify/css/ui.notify.css" />
+<link rel="stylesheet" href="ImajnetLib/lib/colorbox/colorbox.css" />
+
+<script type="text/javascript" src="ImajnetLib/lib/proj4js/proj4js.js"></script>
+<script type="text/javascript" src="ImajnetLib/lib/proj4js/merc.js"></script>
+<script type="text/javascript"
+	src="ImajnetLib/lib/jquery/jquery-1.9.1.min.js"></script>
+
+<script type="text/javascript"
+	src="ImajnetLib/lib/jquery/jquery-migrate-1.1.0.min.js"></script>
+<script type="text/javascript"
+	src="ImajnetLib/lib/jquery-ui-1.9.0.custom/js/jquery-ui-1.9.0.custom.js"></script>
+
+<script type="text/javascript"
+	src="ImajnetLib/lib/jquery/jquery.mobile.custom.min.js"></script>
+
+<script type="text/javascript"
+	src="ImajnetLib/lib/jquery-i18n/jquery.i18n.js"></script>
+<script type="text/javascript"
+	src="ImajnetLib/lib/jquery-corner/jquery.corner.js"></script>
+<!-- <script type="text/javascript" -->
+<!-- 	src="../layerAttributesCount/lib/touch/jquery.mobile-events.min.js"></script> -->
+<script type="text/javascript"
+	src="ImajnetLib/lib/touchSwipe/jquery.touchSwipe.min.js"></script>
+<script type="text/javascript"
+	src="ImajnetLib/lib/loadmask/jquery.loadmask.min.js"></script>
+<script type="text/javascript" src="ImajnetLib/lib/Raphael/raphael.js"></script>
+<script type="text/javascript"
+	src="ImajnetLib/lib/jquery-url/jquery.url.js"></script>
+<script type="text/javascript"
+	src="ImajnetLib/lib/jquery-notify/jquery.notify.min.js"></script>
+<script type="text/javascript"
+	src="ImajnetLib/lib/colorbox/jquery.colorbox-min.js"></script>
+<script type="text/javascript"
+	src="ImajnetLib/lib/jquery-combobox/combobox.js"></script>
+<script type="text/javascript"
+	src="ImajnetLib/lib/customCheck/iCheck.js"></script>
+<script type="text/javascript" src="ImajnetLib/lib/threejs/three.js"></script>
+<script type="text/javascript"
+	src="ImajnetLib/lib/threejs/CanvasRenderer.js"></script>
+<script type="text/javascript" src="ImajnetLib/lib/threejs/Projector.js"></script>
+<script type="text/javascript"
+	src="ImajnetLib/lib/touchSwipe/jquery.touchSwipe.min.js"></script>
+<script type="text/javascript" src="ImajnetLib/lib/pngtoy/pngtoy.min.js"></script>
+<script type="text/javascript" src="ImajnetLib/lib/JSTS/jsts.js"></script>
+<script type="text/javascript" src="ImajnetLib/lib/jquery-sessiontimer/iddle-timer.js"></script>
+<script type="text/javascript" src="ImajnetLib/lib/jquery-sessiontimer/jquery.iddletimeout.js"></script>
+
+<!--DEV_BEG-->
+
+<link rel="stylesheet" href="ImajnetLib/css/imajnetLibrary.css" />
+<script type="text/javascript" src="ImajnetLib/js/imajnetLibrary.js"></script>
+<!--
+
+<link rel="stylesheet" href="../imajnet-sdk/code/imajnet-sdk-javascript/css/login.css" /> 
+ <link rel="stylesheet" href="../imajnet-sdk/code/imajnet-sdk-javascript/css/imajnet.css" /> 
+ <link rel="stylesheet" href="../imajnet-sdk/code/imajnet-sdk-javascript/address/css/address.css" /> 
+ <link rel="stylesheet" href="../imajnet-sdk/code/imajnet-sdk-javascript/LRS/css/LRS.css" />
+
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnetPlugin.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnetUserMessages.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnetPlugin.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnet.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/applicationStorage.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnetUrl.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/security/imajnetResponse.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/nigsys.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnetUser.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnetDocking.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnetTimeframe.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnetEvents.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnet.ui.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnetLRSGUI.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnet.map.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnetAPI.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnetData.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnetProtocol.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/settings/imajnetSettings.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/settings/imajnetUserSettings.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/settings/imajnetLRSSettings.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/settings/imajnetLRSSettingType.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnetZoom.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnetClickMode.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnet3dPosition.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnetPosition.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnetProjection.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/OpenLayersForProjection.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/image/imageControler.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/image/cubePlugin.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/image/imageControl.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/image/flatImage.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/image/cubeImage.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/image/surveyTrace.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/image/flatSurveyTrace.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/image/cubeSurveyTrace.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/image/photogrammetry.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/image/flatPhotogrammetry.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/image/cubePhotogrammetry.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/image/graphic.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/image/flatGraphic.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/image/cubeGraphic.js"></script>
+
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnetMeasurement.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnetPolyligne.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnetImageSwitcher.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/basicAuthentication.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnetNews.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/address/js/address.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/LRS/js/LRS.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/LRS/js/LRSRequest.js"></script>-->
+
+<!--DEV_END-->
+
+<script type="text/javascript" src="ImajnetLib/js/i18n/locale-en.js"></script>
+
+<script>
+	jQuery.noConflict();
+	/*redirection of the console messages to python*/
+	var methods = ['debug','trace','log','info','warn','error','assert'];
+	overwriteConsoleFunction = function(index, func){
+		var exFunc = console[func];
+		console[func] = function(msg) {
+			exFunc.apply(console, arguments);
+	        PyImajnet.log(index,msg);
+	    };
+	}
+	jQuery(function() {			
+		for ( var i in methods) {		
+			overwriteConsoleFunction(i,methods[i])
+		}		
+	});
+
+	jQuery(function() {
+		jQuery("#imajnetTabs").tabs({
+			activate: function(event,ui){
+				if(!ui.newPanel[0]){
+					return;
+				}
+				var tabId=ui.newPanel[0].id; 
+				if(tabId == 'lrsSeatchTab' ){
+					ImajnetPlugin.onImajnetControlPressed(null, 'searchLRS');
+				} else if(tabId == 'clipboardTab' ){
+					ImajnetPlugin.onImajnetControlPressed(null, 'showClipboard');;
+				} else if(tabId == 'newsTab' ){
+					ImajnetPlugin.onImajnetControlPressed(null, 'showNews');
+				} else if(tabId == 'clayerProjectionTab' ){
+					
+				}
+				jQuery('ul.ui-autocomplete').hide();
+			}
+		});
+		
+		jQuery('#imajnetTabs').tabs().find('.ui-tabs-nav li').off('keydown');
+		
+		//translate tabs
+		jQuery('#imajnetTabs ul  li a').each(function(i) {
+			var title = jQuery(this).text();
+			var translatedTitle = PyImajnet.translateText(title);
+			if(translatedTitle && translatedTitle!=''){
+				jQuery(this).html(translatedTitle);
+			}
+		});
+	});
+	
+	
+</script>
+<link rel="stylesheet" href="css/imajnet_qgis.css" />
+<script src="js/imajnet_qgis.js"></script>
+</head>
+<body onload="ImajnetPlugin.activateImajnet();">
+<!-- <body> -->
+	<div id="imajnetTabs">
+		<ul>
+			<li class="tabsLi"><a href="#imageTab" class="tabs">Image</a></li>
+			<li class="tabsLi"><a href="#lrsSeatchTab" class="tabs">LRS Search</a></li>
+			<li class="tabsLi"><a href="#layerProjectionTab" class="tabs">Layer projection</a></li>
+			<li class="tabsLi"><a href="#clipboardTab" class="tabs">Clipboard</a></li>
+			<li class="tabsLi"><a href="#newsTab" class="tabs">News</a></li>
+		</ul>
+		<div id="imageTab" class="mainTabContent">
+			<div id="imajnetContainer">
+				<div id="greenHandler"></div>
+			</div>
+		</div>
+		<div id="lrsSeatchTab" class="mainTabContent">
+			<div id="searchLRSContainer"></div>
+		</div>
+		<div id="layerProjectionTab" class="mainTabContent">
+			<div id="projectedLayersContainer"></div>
+		</div>
+
+		<div id="clipboardTab" class="mainTabContent">
+			<div id="clipboardContainer"></div>
+			<div id="clipboardExportContainer"></div>
+		</div>
+		<div id="newsTab" class="mainTabContent">
+			<div id="newsContainer"></div>
+		</div>
+	</div>
+	<div id="notificationLoginContainer" class="notification ui-notify">
+	</div>
+</body>
+</html>

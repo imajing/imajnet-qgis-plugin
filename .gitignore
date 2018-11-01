@@ -1,0 +1,7 @@
+.settings/
+__pycache__/
+/.metadata/
+bin
+resources.py
+i18n/QGisImajnetPlugin_fr.qm
+QgisImajnetPluginVersion.py
