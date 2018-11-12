@@ -886,6 +886,7 @@ ImajnetPlugin.onWindowResize = function(event) {
 		}
 		jQuery('#imajnetTabs ul li:first-child').hide();
 		ImajnetPlugin.imajnetContainer.prependTo('body');
+		ImajnetPlugin.showImajnetItem(ImajnetUI.searchLRSContainerId);
 	} else {
 		if(previousLayout !== ImajnetPlugin.currentLayout) {
 			ImajnetPlugin.tabsContainer.tabs({
