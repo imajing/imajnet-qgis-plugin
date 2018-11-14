@@ -2,7 +2,7 @@ Combobox = {
     defaultOptions: {
         _create: function() {
             var input, self = this, select = this.element.hide(), selected = select.children(":selected"), value = selected.val() ? selected.text() : "", wrapper = this.wrapper = jQuery("<span>").attr('id', jQuery(this.element).attr('id') + 'Combobox').addClass("ui-combobox ui-combobox-" + jQuery(this.element).attr('id')).insertAfter(select), firstOption = null;
-            input = jQuery("<input>").appendTo(wrapper).val(value).addClass("ui-state-default ui-combobox-input").autocomplete({
+            input = jQuery("<input>").appendTo(wrapper).val(value).addClass('ui-state-default ui-combobox-input' + (self.options.permisive ? ' ui-combobox-input-permisive' : ' ui-combobox-input-nopermisive')).autocomplete({
                 delay: 0,
                 minLength: 0,
                 source: function(request, response) {
@@ -63,9 +63,17 @@ Combobox = {
                             }
                         });
                         if (!valid) {
-                            jQuery(this).val("");
-                            select.val("");
-                            input.data("autocomplete").term = "";
+                        	var firstOptionValue = '';
+                        	if(select.children("option")[0] && select.children("option")[0].value) {
+                        		firstOptionValue = select.children("option")[0].value;
+                        	}
+                        	
+                            jQuery(this).val(firstOptionValue);
+                            select.val(firstOptionValue);
+                            input.data("autocomplete").term = firstOptionValue;
+//                            jQuery(this).val("");
+//                            select.val("");
+//                            input.data("autocomplete").term = "";
                             return false;
                         }
                     }
