@@ -15,7 +15,14 @@ Combobox = {
                     var maxResults = typeof LRS !== 'undefined' ? (LRS.maxRoadsInSelect - 1) : 9999;
                     var results = select.children("option").map(function() {
                         var text = jQuery(this).text();
-                        if (this.value && (!request.term || matcher.test(text))) {
+                        //if (this.value && (!request.term || matcher.test(text))) {
+                        if(!request.term && !this.value) { // If no filter input and select contain empty option allow it	
+                            return {
+                            	label: '&nbsp;',
+                            	value: '',
+                            	option: this
+                            };
+                        } else if(!request.term || matcher.test(text)) {
                             if (!self.firstOption) {
                                 self.firstOption = this;
                             }
@@ -24,7 +31,6 @@ Combobox = {
                                 value: text,
                                 option: this
                             };
-                            return option;
                         }
                     });
                     if (results.length > maxResults) {
