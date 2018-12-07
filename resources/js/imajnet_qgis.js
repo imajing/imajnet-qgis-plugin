@@ -259,6 +259,9 @@ ImajnetPlugin.imajnetLoginSuccess = function() {
 function doLogout(keepSettings, isFromIdle) {
 	//todo: this is a dummy implementation
 	deactivateImajnet();
+	if(isFromIdle) {
+		onProjectSaving();
+	}
 	window.localStorage.clear();//we keep localstorage in qgis
 	if(!keepSettings) {
 		var imajnetLoginSettings = PyImajnet.loadSettings().imajnetLoginSettings;
@@ -989,14 +992,6 @@ ImajnetPlugin.onImajnetActivated = function() {
 	});
 	
 	Nigsys.initModalOverlay('body');
-	jQuery.idleTimeout(document, null, {
-        idleAfter: Nigsys.sessionTimeout, /* 29 minutes and 55 seconds */
-//      idleAfter: 5,
-        titleMessage: '',
-        onIdle: function() {
-        	doLogout(true, true);
-        }
-    });
 	
 }
 
