@@ -174,8 +174,8 @@
 		});
 		
 		jQuery.idleTimeout(document, document, {
-//	        idleAfter: Nigsys.sessionTimeout, /* 29 minutes and 55 seconds */
-	      	idleAfter: 20,
+	        idleAfter: Nigsys.sessionTimeout, /* 29 minutes and 55 seconds */
+// 	      	idleAfter: 20,
 	        titleMessage: '',
 	        onIdle: function() {
 	        	doLogout(true, true);
