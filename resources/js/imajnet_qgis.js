@@ -248,7 +248,7 @@ ImajnetPlugin.imajnetLoginError = function(jqxhr) {
 }
 
 ImajnetPlugin.imajnetLoginSuccess = function() {	        
-	//nothing to do
+	PyImajnet.imajnetLoginSuccess(ImajnetUser.data);
 }
 
 /**

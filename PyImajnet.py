@@ -651,6 +651,13 @@ class PyImajnet(QWidget):
     def onImajnetActivated(self):
         self._plugin.enableImajnetActions()
     
+    @pyqtSlot('QVariantMap')
+    def imajnetLoginSuccess(self, user):
+        if "imajnet-" in user["role"]["name"] :
+            self._plugin.enableAdvancedFeatures()
+        else :
+            self._plugin.disableAdvancedFeatures()
+        
     @pyqtSlot(str,result=str) 
     def translateText(self, text):
         return self._plugin.tr(text)

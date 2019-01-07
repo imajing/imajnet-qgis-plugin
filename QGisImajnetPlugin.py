@@ -26,7 +26,7 @@
 # from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage
 
 
-from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt, QUrl
+from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt, QUrl,QObject
 from PyQt5.QtGui import QIcon, QKeySequence,QDesktopServices
 from PyQt5.QtWidgets import QAction
 # Initialize Qt resources from file resources.py
@@ -264,6 +264,52 @@ class QGisImajnetPlugin:
         self._debugModeAction.setShortcut(debugShortcutKeys)
         #self._debugModeAction.setVisible(False)
         
+                
+        self._jumpForwardAction = self.add_action(
+            ':/plugins/imajnet-qgis-plugin/resources/img/icon.png',
+            text=self.tr(u'jump forward'),
+            callback=self.jumpForward,
+            enabled_flag=True,
+            add_to_menu=False,
+            add_to_toolbar=False,
+            parent=self.iface.mainWindow())
+        jumpForwardShortcutKeys = QKeySequence("PgUp")
+        self._jumpForwardAction.setShortcut(jumpForwardShortcutKeys)
+        
+        self._jumpBackwardAction = self.add_action(
+            ':/plugins/imajnet-qgis-plugin/resources/img/icon.png',
+            text=self.tr(u'jump backward'),
+            callback=self.jumpBackward,
+            enabled_flag=True,
+            add_to_menu=False,
+            add_to_toolbar=False,
+            parent=self.iface.mainWindow())                
+        jumpBackwardShortcutKeys = QKeySequence("PgDown")
+        self._jumpBackwardAction.setShortcut(jumpBackwardShortcutKeys)
+        
+        
+        self._jumpForwardShortAction = self.add_action(
+            ':/plugins/imajnet-qgis-plugin/resources/img/icon.png',
+            text=self.tr(u'jump forward short'),
+            callback=self.jumpForwardShort,
+            enabled_flag=True,
+            add_to_menu=False,
+            add_to_toolbar=False,
+            parent=self.iface.mainWindow())
+        jumpForwardShortShortcutKeys = QKeySequence("Shift+PgUp")
+        self._jumpForwardShortAction.setShortcut(jumpForwardShortShortcutKeys)
+        
+        self._jumpBackwardShortAction = self.add_action(
+            ':/plugins/imajnet-qgis-plugin/resources/img/icon.png',
+            text=self.tr(u'jump backward short'),
+            callback=self.jumpBackwardShort,
+            enabled_flag=True,
+            add_to_menu=False,
+            add_to_toolbar=False,
+            parent=self.iface.mainWindow())                
+        jumpBackwardShortShortcutKeys = QKeySequence("Shift+PgDown")
+        self._jumpBackwardShortAction.setShortcut(jumpBackwardShortShortcutKeys)
+        
     #--------------------------------------------------------------------------
 
     def onClosePlugin(self):
@@ -300,7 +346,7 @@ class QGisImajnetPlugin:
 
         self.pluginIsActive = False
 
-
+        #self.iface.unregisterMainWindowAction(self._jumpForwardAction)
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -472,3 +518,27 @@ class QGisImajnetPlugin:
         else:
             self.iface.removePluginWebMenu(self.menu,self._debugModeAction)
         self.iface.messageBar().pushMessage("Imajnet", "Dev mode toggled", level=Qgis.Info, duration=3)
+    
+    def enableAdvancedFeatures(self):
+        self.iface.addPluginToWebMenu(self.menu,self._jumpForwardAction)
+        self.iface.addPluginToWebMenu(self.menu,self._jumpBackwardAction)
+        self.iface.addPluginToWebMenu(self.menu,self._jumpForwardShortAction)
+        self.iface.addPluginToWebMenu(self.menu,self._jumpBackwardShortAction)
+        
+    def disableAdvancedFeatures(self):
+        self.iface.removePluginWebMenu(self.menu,self._jumpForwardAction)
+        self.iface.removePluginWebMenu(self.menu,self._jumpBackwardAction)
+        self.iface.removePluginWebMenu(self.menu,self._jumpForwardShortAction)
+        self.iface.removePluginWebMenu(self.menu,self._jumpBackwardShortAction)
+        
+    def jumpForward(self):
+        self.dockwidget.m_view.page().currentFrame().evaluateJavaScript("ImajnetAPI.jumpForward()")
+             
+    def jumpBackward(self):
+        self.dockwidget.m_view.page().currentFrame().evaluateJavaScript("ImajnetAPI.jumpBackwards()")    
+    
+    def jumpForwardShort(self):
+        self.dockwidget.m_view.page().currentFrame().evaluateJavaScript("ImajnetAPI.jumpForwardShort()")
+             
+    def jumpBackwardShort(self):
+        self.dockwidget.m_view.page().currentFrame().evaluateJavaScript("ImajnetAPI.jumpBackwardsShort()")
