@@ -552,9 +552,9 @@ class PyImajnet(QWidget):
             return layerAttributes
         for field in layer.fields():
             typeName= field.typeName()
-            if not 'String' in typeName and not 'Real' in typeName:
+            if 'Date' in typeName:
                 continue
-            if 'Real' in typeName:
+            if 'Real' in typeName or 'Integer' in typeName:
                 typeName = 'Number'
             attribute = dict()
             attribute["name"]= field.name()
