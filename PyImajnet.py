@@ -480,7 +480,7 @@ class PyImajnet(QWidget):
             
         feature = QgsFeature(layer.fields())
         
-        if not zAttributeName is None:
+        if zAttributeName is not None:
             feature.setAttribute(zAttributeName,zValue)
             
         #todo: refactor JS!!!!!!
@@ -573,6 +573,7 @@ class PyImajnet(QWidget):
         self.qgsPointProjectedLayers = []
         for jsLayer in projectedLayers:
             layerId=jsLayer["id"]
+            zField = jsLayer["zField"]
             ImajnetLog.debug("{}".format(layerId))
             
             layer = QgsProject.instance().mapLayer(layerId)
@@ -605,14 +606,13 @@ class PyImajnet(QWidget):
             jsLayer = self.qgisLayerToLayerWrapper(layer)
             jsLayer["features"]= []
             
-            zField = jsLayer["zField"]
             
             for feature in layer.getFeatures(request):
                 featureGeometry = feature.geometry()
                 if featureGeometry.intersects(constraintGeom):
                     featureWrapper=self.qgisFeatureToFeatureWrapper(layer,feature)
                     
-                    if not zField is none :
+                    if zField :
                         featureWrapper["zField"]=feature.attribute(zField);
                         
                     #geometry may be big, we need to clip it
