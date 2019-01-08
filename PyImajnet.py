@@ -16,7 +16,7 @@ from numpy import double
 # from PySide import QtGui, QtCore, QtWebKit
 from PyQt5.QtWidgets import QApplication, QSplitter, QVBoxLayout, QWidget, QFileDialog
 from qgis.utils import iface
-from qgis.core import  QgsRenderContext,QgsProject, QgsMapLayer,QgsWkbTypes, QgsRasterLayer, QgsCoordinateReferenceSystem, QgsCoordinateTransform
+from qgis.core import  QgsRenderContext,QgsProject, QgsMapLayer,QgsVectorDataProvider, QgsWkbTypes, QgsRasterLayer, QgsCoordinateReferenceSystem, QgsCoordinateTransform
 from .ImajnetUtils import ImajnetUtils
 from .MarkerManager import MarkerManager
 from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkCookieJar, QNetworkRequest
@@ -153,19 +153,22 @@ class PyImajnet(QWidget):
         return json.loads(center)
     
     def qgisLayerToLayerWrapper(self, layer):
-        return self.createLayerWrapper(layer.name(), layer.id(), PyImajnet.geometryTypes[layer.geometryType()])
+        hasZ=QgsWkbTypes.hasZ(layer.dataProvider().wkbType())
+        return self.createLayerWrapper(layer.name(), layer.id(), PyImajnet.geometryTypes[layer.geometryType()],hasZ)
     
     def qgisFeatureToFeatureWrapper(self, layer, feature):
         wrapper =self.createFeatureWrapper(layer.id(), layer.name(), feature.id())
         return wrapper
         
-    def createLayerWrapper(self, name, id=None, geometryType=None):
+    def createLayerWrapper(self, name, id=None, geometryType=None, hasZ=False):
         layerWrapper =dict()
         layerWrapper["name"] = name
         if id is not None:
             layerWrapper["id"] = id
         if geometryType is not None:
-            layerWrapper["geometryType"] = geometryType           
+            layerWrapper["geometryType"] = geometryType 
+        if hasZ is not None:
+            layerWrapper["hasZ"] = hasZ               
         return layerWrapper
 
     def createFeatureWrapper(self,layerId, layerName, featureId):
@@ -416,30 +419,34 @@ class PyImajnet(QWidget):
     def getLocale(self):
         return QSettings().value('locale/userLocale')[0:2]
     
+    
+    def _isLayerEditable(self, layer):
+        if layer.type() != QgsMapLayer.VectorLayer :
+            ImajnetLog.info("Ignoring layer<{}>, not a vector layer".format(layer.name()))
+            return False
+        if layer.readOnly() :
+            ImajnetLog.info("Ignoring layer<{}>, it is readonly".format(layer.name()))
+            return False
+        if not layer.isEditable() :
+            ImajnetLog.info("Ignoring layer<{}>, it isn't editable".format(layer.name()))
+            return False
+        if layer.geometryType() >2 :
+            ImajnetLog.info("Ignoring layer<{}>, bad geometry type".format(layer.name()))
+            return False
+        if not layer.isValid():
+            ImajnetLog.info("Ignoring layer<{}>, not valid".format(layer.name()))
+            return False
+        return True
         
     @pyqtSlot(result='QVariantMap') 
     def getEditableLayers(self):
         layers = QgsProject.instance().layerTreeRoot().layerOrder()
         jsLayers = []
         for  layer in layers:
-            if layer.type() != QgsMapLayer.VectorLayer :
-                ImajnetLog.info("Ignoring layer<{}>, not a vector layer".format(layer.name()))
-                continue
-            if layer.readOnly() :
-                ImajnetLog.info("Ignoring layer<{}>, it is readonly".format(layer.name()))
-                continue
-            if not layer.isEditable() :
-                ImajnetLog.info("Ignoring layer<{}>, it isn't editable".format(layer.name()))
-                continue
-            if layer.geometryType() >2 :
-                ImajnetLog.info("Ignoring layer<{}>, bad geometry type".format(layer.name()))
-                continue
-            if not layer.isValid():
-                ImajnetLog.info("Ignoring layer<{}>, not valid".format(layer.name()))
+            if not self._isLayerEditable(layer) :
                 continue
             jsLayer = self.qgisLayerToLayerWrapper(layer)
             jsLayers.append(jsLayer)
-        
         result = dict()
         result["layers"] = jsLayers
         return self.returnPyDictToJs(result)
@@ -465,15 +472,17 @@ class PyImajnet(QWidget):
         result["layers"] = jsLayers
         return self.returnPyDictToJs(result)
     
-    @pyqtSlot('QVariantMap','QVariantMap',result=bool) 
-    def addGeometryToLayer(self, jsLayer, jsGeom):
+    @pyqtSlot('QVariantMap','QVariantMap', "QString", "QString",result=bool) 
+    def addGeometryToLayer(self, jsLayer, jsGeom, zAttributeName, zValue):
         ImajnetLog.debug("addGeometryToLayer: {},{}".format(jsLayer,jsGeom))
         #try:
         layer = QgsProject.instance().mapLayer(jsLayer["id"])
             
         feature = QgsFeature(layer.fields())
         
-        
+        if not zAttributeName is None:
+            feature.setAttribute(zAttributeName,zValue)
+            
         #todo: refactor JS!!!!!!
         geometryType = PyImajnet.geometryTypes[layer.geometryType()]
         geom = None
@@ -505,7 +514,56 @@ class PyImajnet(QWidget):
         #except:
         #   ImajnetLog.error("Unable to add geometry to layer: {}, {}".format(jsLayer,sys.exc_info()[0]))
         #   return False
+    
+    @pyqtSlot('QVariantMap','QVariantMap',result=bool) 
+    def addAttributeToLayer(self, jsLayer, attribute):
+        layer = QgsProject.instance().mapLayer(jsLayer["id"])
+        layerAttributes=[]
+        if layer is None:
+            return False
+        pr = layer.dataProvider()
+        result = pr.addAttributes([
+                        QgsField(attribute["name"], QVariant.String)])
+        if not result:
+            return False
+        layer.updateFields()
         
+        return True
+    
+    @pyqtSlot('QVariantMap',result=bool) 
+    def canAddAttributesToLayer(self, jsLayer):
+        layer = QgsProject.instance().mapLayer(jsLayer["id"])
+        layerAttributes=[]
+        if layer is None:
+            return False
+        if not self._isLayerEditable(layer):
+            return False
+        
+        capabilities = layer.dataProvider().capabilities()
+        ImajnetLog.info("capabilities: {}".format(capabilities))
+        return capabilities & QgsVectorDataProvider.AddAttributes
+          
+          
+    @pyqtSlot('QVariantMap',result='QVariantMap') 
+    def getLayerAttributes(self, jsLayer):
+        layer = QgsProject.instance().mapLayer(jsLayer["id"])
+        layerAttributes=[]
+        if layer is None:
+            return layerAttributes
+        for field in layer.fields():
+            typeName= field.typeName()
+            if not 'String' in typeName and not 'Real' in typeName:
+                continue
+            if 'Real' in typeName:
+                typeName = 'Number'
+            attribute = dict()
+            attribute["name"]= field.name()
+            attribute["type"]=typeName
+            layerAttributes.append(attribute)
+        result = dict()
+        result["attributes"] = layerAttributes
+        return self.returnPyDictToJs(result)
+    
     @pyqtSlot('QVariantMap','QVariantMap','QVariant',result='QVariantMap')
     def getProjectionCandidates(self, position, constraintGeometry, projectedLayers):
         ImajnetLog.info("getProjectionCandidates: {}, geom not printed, {}".format(position,projectedLayers))
@@ -547,11 +605,16 @@ class PyImajnet(QWidget):
             jsLayer = self.qgisLayerToLayerWrapper(layer)
             jsLayer["features"]= []
             
+            zField = jsLayer["zField"]
+            
             for feature in layer.getFeatures(request):
                 featureGeometry = feature.geometry()
                 if featureGeometry.intersects(constraintGeom):
                     featureWrapper=self.qgisFeatureToFeatureWrapper(layer,feature)
                     
+                    if not zField is none :
+                        featureWrapper["zField"]=feature.attribute(zField);
+                        
                     #geometry may be big, we need to clip it
                     featureGeometry = featureGeometry.clipped(constraintGeom.boundingBox())
                     
