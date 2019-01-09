@@ -480,7 +480,7 @@ class PyImajnet(QWidget):
             
         feature = QgsFeature(layer.fields())
         
-        if zAttributeName is not None:
+        if zAttributeName:
             feature.setAttribute(zAttributeName,zValue)
             
         #todo: refactor JS!!!!!!
@@ -551,15 +551,22 @@ class PyImajnet(QWidget):
         if layer is None:
             return layerAttributes
         for field in layer.fields():
-            typeName= field.typeName()
-            if 'Date' in typeName:
+            typeName= field.typeName().lower()
+            sdkTypeName= None
+            if 'date' in typeName or 'bool' in typeName:
                 continue
-            if 'Real' in typeName or 'Integer' in typeName:
-                typeName = 'Number'
-            attribute = dict()
-            attribute["name"]= field.name()
-            attribute["type"]=typeName
-            layerAttributes.append(attribute)
+            if 'real' in typeName or 'float' in typeName or 'double' in typeName or 'decimal' in typeName:
+                sdkTypeName = 'Real'
+            if 'int' in typeName or 'numeric' in typeName or 'long' in typeName:
+                sdkTypeName = 'Integer'
+            if 'string' in typeName or 'char' in typeName or 'text' in typeName:
+                sdkTypeName = 'String'
+            
+            if  sdkTypeName : 
+                attribute = dict()
+                attribute["name"]= field.name()
+                attribute["type"]=sdkTypeName
+                layerAttributes.append(attribute)
         result = dict()
         result["attributes"] = layerAttributes
         return self.returnPyDictToJs(result)

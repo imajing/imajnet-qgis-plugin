@@ -717,6 +717,21 @@ ImajnetPlugin.getProjectionCandidates = function(position, constraintGeometry) {
 			for(var j = 0; j < layerWrapper.features.length; j++) {
 				featureWrapper = merge_options(featureWrapperTemplate, layerWrapper.features[j]);
 				featureWrapper.setGeometry(wktReader.read(layer.features[j].geometry).getCoordinates());
+				
+				//here we set the height if layer does not have Z
+				if(featureWrapper.zField) {
+					var zValues = null;
+					if(isNaN(featureWrapper.zField)) {
+						zValues = featureWrapper.zField.split(',');
+					}
+					for(var k = 0; k < featureWrapper.geometry.length; k++) {
+						if(zValues) {
+							featureWrapper.geometry[k].z = zValues[k];
+						} else {
+							featureWrapper.geometry[k].z = featureWrapper.zField;
+						}
+					}
+				}
 				if(layerWrapper.getGeometryType() == 'point' && featureWrapper.style[0].externalGraphic) {
 					var egString = featureWrapper.style[0].externalGraphic;
 					var svg = egString.substring(egString.indexOf('<svg'), egString.indexOf('/svg>') + 5);
@@ -1013,8 +1028,27 @@ ImajnetPlugin.getReadableLayers = function() {
 	return layers;
 }
 
+ImajnetPlugin.getLayerAttributes = function(layer) {
+	return PyImajnet.getLayerAttributes(layer).attributes;
+}
+
 ImajnetPlugin.addGeometryToLayer = function(layerWrapper, geometry) {
-	return PyImajnet.addGeometryToLayer(layerWrapper, geometry);
+	var projectedLayer = ImajnetProjection.getProjectedLayerById(layerWrapper.getId());
+	var zField = null;
+	var height = null;
+	if(projectedLayer && projectedLayer.zField) {
+		height = '';
+		zField = projectedLayer.zField;
+		zFieldType = projectedLayer.zFieldType
+		if(zFieldType.indexOf('string') > -1 || zFieldType.indexOf('text') > -1 || zFieldType.indexOf('char') > -1) {
+			for(var i = 0; i < geometry.length; i++) {
+				height+= geometry[i].z + ',';
+			}
+		} else {
+			height = geometry[0].z
+		}
+	}
+	return PyImajnet.addGeometryToLayer(layerWrapper, geometry, zField, height);
 }
 
 ImajnetPlugin.getLocalStorageKeys = function() {
