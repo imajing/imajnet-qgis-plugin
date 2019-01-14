@@ -269,7 +269,10 @@
 					"credentialsExpired" : "Unauthorized access! Credentials expired.",
 					"invalidApplicationKey" : "Unauthorized access! This application is not authorized to connect to Imajnet.",
 					"invalidSessionType" : "Unauthorized access! An invalid session type was requested to Imajnet.",
-					"unauthorizedSessionType" : "Unauthorized access! You are not authorized to open a session of the requested type."
+					"unauthorizedSessionType" : "Unauthorized access! You are not authorized to open a session of the requested type.",
+					"oauthInternalServerError" : "Authentication server error",
+					"oauthInvalidTokenError" : "Authentication token validation error",
+					"oauthAccessDeniedToResourceServerError" : "Authentication server does not allow access to this resource"	
 				}
 			},
 			"button" : "Login",
@@ -283,7 +286,10 @@
 		},
 		"projectedLayers": {
 			"groundProjection" : "Ground projection",
-			"heightOffset" : "Height offset"
+			"heightOffset" : "Height offset",
+			"zFromAttribute" : "Get Z from attribute",
+			"addAttribute" : "Add new attribute",
+			"addButton": "Add"
 		},
 		"addToLayer": {
 			"selectLayer": "Select layer",

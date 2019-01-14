@@ -258,23 +258,24 @@ ImajnetPlugin.imajnetLoginSuccess = function() {
  */
 function doLogout(keepSettings, isFromIdle) {
 	//todo: this is a dummy implementation
-	deactivateImajnet();
-	if(isFromIdle) {
-		onProjectSaving();
-	}
-	window.localStorage.clear();//we keep localstorage in qgis
-	if(!keepSettings) {
-		var imajnetLoginSettings = PyImajnet.loadSettings().imajnetLoginSettings;
-		delete imajnetLoginSettings.username;
-		delete imajnetLoginSettings.password;
-		PyImajnet.saveSettings(imajnetLoginSettings, {}, {});
-	}
-	ImajnetUrl.deleteUrlParams();
-	if(isFromIdle) {
-		ImajnetPlugin.showLogin();
-	} else {
-		window.location.reload();
-	}
+	deactivateImajnet().done(function() {
+		if(isFromIdle) {
+			onProjectSaving();
+		}
+		window.localStorage.clear();//we keep localstorage in qgis
+		if(!keepSettings) {
+			var imajnetLoginSettings = PyImajnet.loadSettings().imajnetLoginSettings;
+			delete imajnetLoginSettings.username;
+			delete imajnetLoginSettings.password;
+			PyImajnet.saveSettings(imajnetLoginSettings, {}, {});
+		}
+		ImajnetUrl.deleteUrlParams();
+		if(isFromIdle) {
+			ImajnetPlugin.showLogin();
+		} else {
+			window.location.reload();
+		}
+	});
 }
 
 /**
@@ -286,9 +287,8 @@ function deactivateImajnet() {
 	//this line is needed only because the plugin is crashing when deactivated after projecting point layers
 	jQuery("div").remove("#popupImajnetControlsLayer");
 	
-	Imajnet.deactivateImajnet(true);
 	jQuery('#clipboardExportContainer').dialog('close');
-
+	return Imajnet.deactivateImajnet(true, false, true, true);
 }
 
 // Toggle OL controls style
@@ -347,8 +347,7 @@ ImajnetPlugin.getCurrentZoomLevel = function() {
 /**
  * Zooms the underying map to the given zoom level
  * 
- * @param zoom
- *            the desired zoom level
+ * @param zoom the desired zoom level
  * @method zoomMapTo
  */
 ImajnetPlugin.zoomMapTo = function(zoom) {
@@ -1028,8 +1027,16 @@ ImajnetPlugin.getReadableLayers = function() {
 	return layers;
 }
 
-ImajnetPlugin.getLayerAttributes = function(layer) {
-	return PyImajnet.getLayerAttributes(layer).attributes;
+ImajnetPlugin.getLayerAttributes = function(layerWrapper) {
+	return PyImajnet.getLayerAttributes(layerWrapper).attributes;
+}
+
+ImajnetPlugin.canAddAttributesToLayer = function(layerWrapper) {
+	return PyImajnet.canAddAttributesToLayer(layerWrapper);
+}
+
+ImajnetPlugin.addAttributeToLayer = function(layerWrapper, attribute) {
+	return PyImajnet.addAttributeToLayer(layerWrapper, attribute);
 }
 
 ImajnetPlugin.addGeometryToLayer = function(layerWrapper, geometry) {
@@ -1040,12 +1047,15 @@ ImajnetPlugin.addGeometryToLayer = function(layerWrapper, geometry) {
 		height = '';
 		zField = projectedLayer.zField;
 		zFieldType = projectedLayer.zFieldType
-		if(zFieldType.indexOf('string') > -1 || zFieldType.indexOf('text') > -1 || zFieldType.indexOf('char') > -1) {
+		if(zFieldType == 'String') {
 			for(var i = 0; i < geometry.length; i++) {
 				height+= geometry[i].z + ',';
 			}
+			height = height.substring(0, height.length - 1);
+		} else if(zFieldType == 'Integer'){
+			height = parseInt(geometry[0].z)
 		} else {
-			height = geometry[0].z
+			height = geometry[0].z;
 		}
 	}
 	return PyImajnet.addGeometryToLayer(layerWrapper, geometry, zField, height);
@@ -1082,7 +1092,9 @@ ImajnetPlugin.resetSettings = function() {
 }
 
 onProjectChange = function() {
-	ImajnetPlugin.initProjectedLayers();
+	if(!isFirstLoad) {
+		ImajnetPlugin.initProjectedLayers();
+	}
 	console.log('onProjectChange');
 }
 
