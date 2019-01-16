@@ -16,6 +16,8 @@ class ImajnetLog(object):
   
     @staticmethod
     def writelogmessage(message, tag, level):
+        if message is None:
+            return
         if ImajnetLog.logfile is None:
             logFileName = os.path.join(tempfile.gettempdir(),ImajnetLog.filename)
             ImajnetLog.logfile = codecs.open(logFileName, 'a+',encoding='utf8')
