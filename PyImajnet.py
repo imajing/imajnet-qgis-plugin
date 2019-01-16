@@ -2,6 +2,7 @@
 import os
 import re
 import collections
+import datetime
 
 from PyQt5 import QtGui, QtWidgets, uic 
 from PyQt5.QtGui import QPainter
@@ -16,7 +17,7 @@ from numpy import double
 # from PySide import QtGui, QtCore, QtWebKit
 from PyQt5.QtWidgets import QApplication, QSplitter, QVBoxLayout, QWidget, QFileDialog
 from qgis.utils import iface
-from qgis.core import  QgsRenderContext,QgsProject, QgsMapLayer,QgsVectorDataProvider, QgsWkbTypes, QgsRasterLayer, QgsCoordinateReferenceSystem, QgsCoordinateTransform
+from qgis.core import  QgsVectorFileWriter, QgsFields, QgsRenderContext,QgsProject, QgsMapLayer,QgsVectorDataProvider, QgsWkbTypes, QgsRasterLayer, QgsCoordinateReferenceSystem, QgsCoordinateTransform
 from .ImajnetUtils import ImajnetUtils
 from .MarkerManager import MarkerManager
 from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkCookieJar, QNetworkRequest
@@ -84,6 +85,10 @@ class PyImajnet(QWidget):
         #self.generator.setSize( self.markerSize )
         #self.generator.setViewBox( QRect( 0, 0, self.markerSize.height(), self.markerSize.height() ) )
         #self.painter = QPainter(self.generator );
+        
+        #TODO: remove after implementing real ROI feature
+        self.roiFileDownloadNetworkAccessManager = QNetworkAccessManager()
+        self.roiFileDownloadNetworkAccessManager.finished.connect(self.roiFileDownloadFinished)
         
     def populateJavaScriptWindowObject(self):
         """
@@ -451,19 +456,24 @@ class PyImajnet(QWidget):
         result["layers"] = jsLayers
         return self.returnPyDictToJs(result)
     
+    def _isLayerReadable(self, layer):
+        if layer.type() != QgsMapLayer.VectorLayer :
+            ImajnetLog.info("Ignoring layer<{}>, not a vector layer".format(layer.name()))
+            return False
+        if layer.geometryType() >2 :
+            ImajnetLog.info("Ignoring layer<{}>, bad geometry type".format(layer.name()))
+            return False
+        if not layer.isValid():
+            ImajnetLog.info("Ignoring layer<{}>, not valid".format(layer.name()))
+            return False
+        return True
+    
     @pyqtSlot(result='QVariantMap') 
     def getReadableLayers(self):
         layers = QgsProject.instance().layerTreeRoot().layerOrder()
         jsLayers = []
         for  layer in layers:
-            if layer.type() != QgsMapLayer.VectorLayer :
-                ImajnetLog.info("Ignoring layer<{}>, not a vector layer".format(layer.name()))
-                continue
-            if layer.geometryType() >2 :
-                ImajnetLog.info("Ignoring layer<{}>, bad geometry type".format(layer.name()))
-                continue
-            if not layer.isValid():
-                ImajnetLog.info("Ignoring layer<{}>, not valid".format(layer.name()))
+            if not self._isLayerReadable(layer) :
                 continue
             jsLayer = self.qgisLayerToLayerWrapper(layer)
             jsLayers.append(jsLayer)
@@ -753,10 +763,124 @@ class PyImajnet(QWidget):
     
     
              
+    #############################################
+    ###### ROI temporary ########################
+    #############################################
     
-    
-    
-
+    @pyqtSlot('QVariantMap','QVariantMap', "QVariantMap", "QString",result=bool) 
+    def createROI(self, roi, imageDetails,photogrammetryInfo,imageUrl):
+        #iterate editable layers and find one that corresponds to the ROI structure
+        layers = QgsProject.instance().layerTreeRoot().layerOrder()
+        self.roiLayer = None
+        for  layer in layers:
+            if not self._isLayerReadable(layer) :
+                continue      
+            #fields[0] = FID
+            fields = layer.fields()
+            index=-1
+            #ImajnetLog.error(fields[index+1].name())
+            #ImajnetLog.error(fields[index+2].name())
+            #ImajnetLog.error(fields[index+3].name())
+            #ImajnetLog.error(fields[index+4].name())
+            #ImajnetLog.error(fields[index+5].name())
+            #ImajnetLog.error(fields[index+6].name())
             
-   
+            #ImajnetLog.error("ok:{}".format('FID' in fields[0].name() and 'Sequence' in fields[1].name()) )
+            valid=('label' in fields[index+1].name()) and  ('comment' in fields[index+2].name()) and  ('image' in fields[index+3].name()) and  ('width' in fields[index+4].name()) and  ('height' in fields[index+5].name()) and  ('xmin' in fields[index+6].name()) and ('ymin' in fields[index+7].name()) and  ('xmax' in fields[index+8].name()) and  ('ymax' in fields[index+9].name())
+
+            if valid :
+                self.roiLayer = layer
+            break
+        
+        if not self.roiLayer:
+            fields = QgsFields()
+            fields.append(QgsField("label", QVariant.String))
+            fields.append(QgsField("comment", QVariant.String))
+            fields.append(QgsField("image", QVariant.String))
+            fields.append(QgsField("width",  QVariant.Int))
+            fields.append(QgsField("height",  QVariant.Int))
+            fields.append(QgsField("xmin", QVariant.Int))
+            fields.append(QgsField("ymin", QVariant.Int))
+            fields.append(QgsField("xmax", QVariant.Int))
+            fields.append(QgsField("ymax", QVariant.Int))
+            fields.append(QgsField("aux1", QVariant.String))
+            now = datetime.datetime.now()
+            timestamp = now.strftime("%Y%m%d_%H%M")
+            layerPath = os.path.join(QgsProject.instance().readPath("./"),"imajnet_roi_{}.shp".format(timestamp))
+            writer = QgsVectorFileWriter(layerPath,
+                             "utf8",
+                             fields,
+                             QgsWkbTypes.Point, 
+                             QgsCoordinateReferenceSystem(4326), 
+                             "ESRI Shapefile")
+            del writer
+            #self.roiLayer = QgsVectorLayer("point?crs=epsg:4326", "Imajnet ROI", "memory")
+            self.roiLayer = QgsVectorLayer(layerPath, "Imajnet ROI {}".format(timestamp), "ogr")
+    
+            #pr = self.roiLayer.dataProvider()
+            #pr.addAttributes([QgsField("label", QVariant.String),
+            #               QgsField("comment", QVariant.String),
+            #                QgsField("image", QVariant.String),
+            #               QgsField("width",  QVariant.Int),
+            #                QgsField("height",  QVariant.Int),
+            #                QgsField("xmin", QVariant.Double),
+            #                QgsField("ymin", QVariant.Double),
+            #                QgsField("xmax", QVariant.Double),
+            #                QgsField("ymax", QVariant.Double)])
+            #pr.addAttributes(fields.toList())
+            #self.roiLayer.updateFields() # tell the vector layer to fetch changes from the provider
+            QgsProject.instance().addMapLayer(self.roiLayer)
+         
+        if not self._isLayerEditable(self.roiLayer) :
+            self.roiLayer.startEditing()
+
+        if not self.roiLayer.isValid():
+          return False
+        self.roiCoord = QgsGeometry.fromPointXY(QgsPointXY(float(imageDetails["lon"]), float(imageDetails["lat"])))
+        self.roiAttributes=["", "","", float(photogrammetryInfo["width"]), float(photogrammetryInfo["height"]),
+                             float(roi["xmin"]),float(roi["ymin"]),float(roi["xmax"]),float(roi["ymax"]),json.dumps(imageDetails)]
+        self.downloadFileForROI(imageUrl)
+        return True
+        
+    @pyqtSlot(str)
+    def downloadFileForROI(self, url):
+        self.roiFileDownloadNetworkAccessManager.setCookieJar(self.networkAccessManager.cookieJar())
+        roiDownloadRequest = QNetworkRequest(QUrl(url))
+        self.roiDownloadReply = self.roiFileDownloadNetworkAccessManager.get(roiDownloadRequest)
+        
+    def roiFileDownloadFinished(self):
+        path = os.path.expanduser(os.path.join('~', unicode(self.roiDownloadReply.url().path()).split('/')[-1]))
+        imgFileName = ""
+        if path.find('position')!=-1:
+            imgId = re.search('id":"(.+?)"', path)
+            if imgId:
+                imgFileName = "imajnet_image_" + imgId.group(1) + '.jpeg'
+            else:
+                imgFileName='image.jpeg'
+        imageDir=os.path.join(QgsProject.instance().readPath("./"),"images")
+        if not os.path.exists(imageDir):
+            os.makedirs(imageDir)
+        path = os.path.join(imageDir, imgFileName)
+        with open(path, 'wb') as f:
+                f.write((self.roiDownloadReply.readAll()))
+                f.close()            
+        
+        feature = QgsFeature()
+        feature.setGeometry(self.roiCoord )
+        self.roiAttributes[2]=imgFileName
+        feature.setAttributes(self.roiAttributes)
+        #feature.setAttribute('image',imgFileName)
+        
+        (res, outFeats) = self.roiLayer.dataProvider().addFeatures([feature])
+        if res:
+                self.roiLayer.updateExtents()       
+                self.roiLayer.triggerRepaint()
+                feature = outFeats[0]
+                fid = feature.id()
+                ImajnetLog.debug('add ROI fid: {}'.format(fid))
+                
+                self.iface.openFeatureForm(self.roiLayer,feature,False,False)
+        else:
+            ImajnetLog.error('unable to add ROI to layer, res:{}'.format(res));
+
             

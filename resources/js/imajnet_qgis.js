@@ -1229,3 +1229,13 @@ findFeatureWrapper = function(layerName, pythonFeatureId){
 Imajnet3dPosition.showPosition = function() {
 	Imajnet3dPosition.isActive = false;
 }
+
+
+/////////////////////////////////////////////////
+//// ROI temporary /////////////////////////////
+/////////////////////////////////////////////////
+pyImajnetCreateROI = function(roi, image, photogrammetryInfo) {
+	var imageUrl = (ImajnetAPI.buildImageURLWithResolution(image, ImajnetSettings.imajnetImageResolutions[3]));
+	
+	return PyImajnet.createROI(roi, image, photogrammetryInfo, imageUrl);
+}

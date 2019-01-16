@@ -19,8 +19,8 @@ class ImajnetLog(object):
         if ImajnetLog.logfile is None:
             logFileName = os.path.join(tempfile.gettempdir(),ImajnetLog.filename)
             ImajnetLog.logfile = codecs.open(logFileName, 'a+',encoding='utf8')
-        #ImajnetLog.logfile.write('{}({}): {}\n'.format(tag, level, message))#.encode('utf_8')
-        ImajnetLog.logfile.write('{}({}): {}\n'.format(tag, level, message)).encode('utf_8')
+        ImajnetLog.logfile.write('{}({}): {}\n'.format(tag, level, message))#.encode('utf_8')
+        #ImajnetLog.logfile.write('{}({}): {}\n'.format(tag, level, message)).encode('utf_8')
     
     @staticmethod
     def init():
