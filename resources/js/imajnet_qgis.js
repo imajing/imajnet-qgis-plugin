@@ -109,7 +109,7 @@ ImajnetPlugin.onImajnetControlPressed = function(buttonElement, controlName) {
 	Imajnet.activateImajnetControl(buttonElement, controlName);
 }
 
-ImajnetPlugin.showLogin = function() {
+ImajnetPlugin.showLogin = function(isFromIdle) {
 	Nigsys.hideLoading(jQuery('body'));
 	jQuery(document).bind('keydown', ImajnetUI.clickLogin);
 	jQuery('body').remove('#modalOverlay').append(Nigsys.modalOverlayDiv);
@@ -127,6 +127,12 @@ ImajnetPlugin.showLogin = function() {
 			ImajnetUI.showNotificationInfo('', jQuery.imajnet.login.error.invalidServerUrl, 'rightBottom');
 			return;
 		}
+		
+		var oldSettings = PyImajnet.loadSettings().imajnetLoginSettings;
+		if(isFromIdle && settings.username === oldSettings.username && settings.password === oldSettings.password && settings.serverUrl === oldSettings.serverUrl){
+			window.location.reload();
+		}
+		
 		PyImajnet.saveSettings(settings, {}, {});
 		ImajnetPlugin.activateImajnet();
 	});
@@ -258,10 +264,10 @@ ImajnetPlugin.imajnetLoginSuccess = function() {
  */
 function doLogout(keepSettings, isFromIdle) {
 	//todo: this is a dummy implementation
+	if(isFromIdle) {
+		onProjectSaving();
+	}
 	deactivateImajnet().done(function() {
-		if(isFromIdle) {
-			onProjectSaving();
-		}
 		window.localStorage.clear();//we keep localstorage in qgis
 		if(!keepSettings) {
 			var imajnetLoginSettings = PyImajnet.loadSettings().imajnetLoginSettings;
@@ -271,7 +277,7 @@ function doLogout(keepSettings, isFromIdle) {
 		}
 		ImajnetUrl.deleteUrlParams();
 		if(isFromIdle) {
-			ImajnetPlugin.showLogin();
+			ImajnetPlugin.showLogin(isFromIdle);
 		} else {
 			window.location.reload();
 		}
@@ -667,7 +673,8 @@ ImajnetPlugin.onImageChange = function(position) {
 		Nigsys.hideLoading(jQuery('body'));
 	}
 	
-	if(ImajnetPlugin.currentLayout == ImajnetPlugin.LAYOUT_DEFAULT) {
+	if(ImajnetPlugin.currentLayout == ImajnetPlugin.LAYOUT_DEFAULT && !ImageControler.currentImageControl.isFastNavigation) {
+		ImageControler.currentImageControl.resetFastNavigation();
 		jQuery("#imajnetTabs").tabs({
 			active : 0
 		})
