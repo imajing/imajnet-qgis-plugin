@@ -790,7 +790,7 @@ class PyImajnet(QWidget):
 
             if valid :
                 self.roiLayer = layer
-            break
+                break
         
         if not self.roiLayer:
             fields = QgsFields()
