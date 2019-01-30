@@ -294,7 +294,7 @@ function deactivateImajnet() {
 	jQuery("div").remove("#popupImajnetControlsLayer");
 	
 	jQuery('#clipboardExportContainer').dialog('close');
-	return Imajnet.deactivateImajnet(true, false, true, true);
+	return Imajnet.deactivateImajnet(true, false, true, false);
 }
 
 // Toggle OL controls style
