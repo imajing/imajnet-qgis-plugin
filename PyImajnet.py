@@ -878,8 +878,10 @@ class PyImajnet(QWidget):
                 feature = outFeats[0]
                 fid = feature.id()
                 ImajnetLog.debug('add ROI fid: {}'.format(fid))
+                featureSaved = self.iface.openFeatureForm(self.roiLayer,feature,False,True)
+                if not featureSaved:
+                	self.roiLayer.deleteFeature(fid)              	
                 
-                self.iface.openFeatureForm(self.roiLayer,feature,False,False)
         else:
             ImajnetLog.error('unable to add ROI to layer, res:{}'.format(res));
 
