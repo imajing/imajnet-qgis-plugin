@@ -32,15 +32,15 @@ class ImajnetUtils:
     #    return ImajnetUtils.transformImajnetCoordToQgisMapCoord(iface.mapCanvas(), position)
     
     @staticmethod
-    def transformImajnetXYPointToQgisMapCoord(mapCanvas, position, destinatonCrs=None):
-        return ImajnetUtils.transformImajnetXYToQgisMapCoord(mapCanvas,ImajnetUtils.getFloatPropertyFromJsObject(position,"x"), ImajnetUtils.getFloatPropertyFromJsObject(position,"y"), ImajnetUtils.getFloatPropertyFromJsObject(position,"z"), destinatonCrs)
+    def transformImajnetXYPointToQgisMapCoord(mapCanvas, position, destinatonCrs=None, ignoreZ = False):
+        return ImajnetUtils.transformImajnetXYToQgisMapCoord(mapCanvas,ImajnetUtils.getFloatPropertyFromJsObject(position,"x"), ImajnetUtils.getFloatPropertyFromJsObject(position,"y"), ImajnetUtils.getFloatPropertyFromJsObject(position,"z"), destinatonCrs, ignoreZ)
     
     @staticmethod
     def transformImajnetCoordToQgisMapCoord(mapCanvas, position):
         return ImajnetUtils.transformImajnetXYToQgisMapCoord(mapCanvas,ImajnetUtils.getFloatPropertyFromJsObject(position,"lon"), ImajnetUtils.getFloatPropertyFromJsObject(position,"lat"))
     
     @staticmethod
-    def transformImajnetXYToQgisMapCoord(mapCanvas, imajnetX, imajnetY, imajnetZ=None, destinatonCrs=None):
+    def transformImajnetXYToQgisMapCoord(mapCanvas, imajnetX, imajnetY, imajnetZ=None, destinatonCrs=None, ignoreZ = False):
         if(destinatonCrs is None):
             #qgisProj = QgsProject.instance().crs()
             destinatonCrs = mapCanvas.mapSettings().destinationCrs()
@@ -49,16 +49,20 @@ class ImajnetUtils:
         mapPoint = None
         if destinatonCrs.srsid() != ImajnetUtils.imajnetProj.srsid():
             transform = QgsCoordinateTransform(ImajnetUtils.imajnetProj, destinatonCrs, QgsProject.instance())
-            if imajnetZ is not None:
+            if imajnetZ is not None and not ignoreZ:
                 mapPoint=QgsPoint(imajnetX,imajnetY,imajnetZ)
                 mapPoint.transform(transform)                
             else:
                 mapPoint = transform.transform(imajnetX, imajnetY)
                 mapPoint = QgsPoint(mapPoint)
+                #mapPoint.dropZValue();
                 
         else:
-            #mapPoint = QgsPointXY(imajnetX, imajnetY)
-            mapPoint = QgsPoint(imajnetX, imajnetY, imajnetZ)
+            if ignoreZ:
+           		mapPoint = QgsPoint(imajnetX, imajnetY)
+           		mapPoint.dropZValue();
+            else:
+            	mapPoint = QgsPoint(imajnetX, imajnetY, imajnetZ)
             
         #ImajnetLog.debug("qgis coord : {}".format(mapPoint))
         return mapPoint
@@ -117,15 +121,21 @@ class ImajnetUtils:
         return geom
     
     @staticmethod
-    def convertJsPointsArrayToPolyline(mapCanvas, pointsArray, destinatonCrs=None):
+    def convertJsPointsArrayToPolyline(mapCanvas, pointsArray, ignoreZ = False, destinatonCrs=None):
         points = []
         for index in range(len(pointsArray)):
         #for key,jsPoint in pointsArray.items():
             jsPoint = pointsArray["{}".format(index)]
             if jsPoint != None:
                 point = ImajnetUtils.transformImajnetXYToQgisMapCoord(mapCanvas,ImajnetUtils.getFloatPropertyFromJsObject(jsPoint,"x"), ImajnetUtils.getFloatPropertyFromJsObject(jsPoint,"y"), ImajnetUtils.getFloatPropertyFromJsObject(jsPoint,"z"),destinatonCrs)
-                points.append(QgsPoint(point))
-        geom =QgsGeometry.fromPolyline(points)
+                if ignoreZ:
+                	points.append(QgsPointXY(point))
+                else:
+                	points.append(QgsPoint(point))
+        if ignoreZ:
+        	geom =QgsGeometry.fromPolylineXY(points)
+        else:
+        	geom =QgsGeometry.fromPolyline(points)
         return geom
     
     @staticmethod

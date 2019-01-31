@@ -497,12 +497,12 @@ class PyImajnet(QWidget):
         geometryType = PyImajnet.geometryTypes[layer.geometryType()]
         geom = None
         if 'point' in geometryType:
-            geom = QgsGeometry(ImajnetUtils.transformImajnetXYPointToQgisMapCoord(self.iface.mapCanvas(),jsGeom["0"],layer.crs()))
+            geom = QgsGeometry(ImajnetUtils.transformImajnetXYPointToQgisMapCoord(self.iface.mapCanvas(),jsGeom["0"],layer.crs(),not jsLayer["hasZ"]))
         else:
             if 'line' in geometryType:
-                geom = QgsGeometry(ImajnetUtils.convertJsPointsArrayToPolyline(self.iface.mapCanvas(),jsGeom,layer.crs()))
+                geom = QgsGeometry(ImajnetUtils.convertJsPointsArrayToPolyline(self.iface.mapCanvas(),jsGeom,not jsLayer["hasZ"],layer.crs()))
             else:
-                geom = QgsGeometry(ImajnetUtils.convertJsPointsArrayToPolygon(self.iface.mapCanvas(),jsGeom,False,layer.crs()))               
+                geom = QgsGeometry(ImajnetUtils.convertJsPointsArrayToPolygon(self.iface.mapCanvas(),jsGeom,not jsLayer["hasZ"],layer.crs()))               
         if geom is not None:
             feature.setGeometry(geom)
 
