@@ -819,6 +819,12 @@ ImajnetPlugin.showImajnetItem = function(id) {
 	jQuery('#' + id).show();
 	if(id == ImajnetUI.clipboardExportContainerId) {
 		jQuery('#clipboardExportContainer').dialog('open');
+		//bug fix for radio buttons not working
+		jQuery('#clipboardExportContainer :radio').on('mousedown', function(event) {
+			event.preventDefault();
+			var checked = jQuery(this).prop('checked');
+			jQuery(this).prop('checked', !checked);
+		})
 	}
 }
 
@@ -1231,6 +1237,7 @@ findFeatureWrapper = function(layerName, pythonFeatureId){
 	}
 	return featureWrapper;
 }
+
 
 //Disable 3d
 Imajnet3dPosition.showPosition = function() {
