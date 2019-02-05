@@ -322,6 +322,10 @@ input[type=button]:hover, input[type=submit]:hover {
 	background: rgb(74, 158, 255);
 }
 
+#colorbox .orderedImageDate {
+	font-size: 16px!important;
+}
+
 /* .ui-combobox { */
 /* 	position: relative !important; */
 /* 	display: inline-block !important; */
