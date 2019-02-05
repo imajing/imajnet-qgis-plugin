@@ -16,10 +16,10 @@
     exports.randomColor = randomColor;
 
   // Support AMD
-  } else if (typeof define === 'function' && define.amd) {
-    define([], factory);
-
-  // Support vanilla script loading
+//  } else if (typeof define === 'function' && define.amd) {
+//    define([], factory);
+//
+//  // Support vanilla script loading
   } else {
     root.randomColor = factory();
   }
