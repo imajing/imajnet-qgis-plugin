@@ -1018,6 +1018,10 @@ ImajnetPlugin.onImajnetActivated = function() {
 		width: 500
 	});
 	
+	jQuery('#popupImajnetClipboardClearButton').on('click', function() {
+		jQuery('#clipboardExportContainer').dialog('close');
+	})
+	
 	Nigsys.initModalOverlay('body');
 	
 }
