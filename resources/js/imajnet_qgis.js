@@ -837,6 +837,11 @@ ImajnetPlugin.showImajnetItem = function(id) {
  */
 ImajnetPlugin.hideImajnetItem = function(id) {
 	jQuery('#' + id).hide();
+	try {
+		if(id == ImajnetUI.clipboardExportContainerId) {
+			jQuery('#clipboardExportContainer').dialog('close');
+		}
+	} catch(e) {}
 }
 
 /**
@@ -1017,10 +1022,6 @@ ImajnetPlugin.onImajnetActivated = function() {
 		autoOpen: false,
 		width: 500
 	});
-	
-	jQuery('#popupImajnetClipboardClearButton').on('click', function() {
-		jQuery('#clipboardExportContainer').dialog('close');
-	})
 	
 	Nigsys.initModalOverlay('body');
 	
