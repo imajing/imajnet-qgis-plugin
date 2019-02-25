@@ -285,6 +285,7 @@
 			}
 		},
 		"projectedLayers": {
+			"title" : "Projected layers",
 			"groundProjection" : "Ground projection",
 			"heightOffset" : "Height offset",
 			"zFromAttribute" : "Get Z from attribute",
