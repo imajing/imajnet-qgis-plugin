@@ -85,6 +85,9 @@ jQuery.imajnet = {
                 "credentialsExpired": "Accès non autorisé ! Identifiants expirés.", 
                 "invalidApplicationKey": "Accès non autorisé ! Cette application n'est pas autorisée à se connecter à Imajnet.", 
                 "invalidSessionType": "Accès non autorisé ! Un type de session invalide a été détecté par Imajnet.", 
+                "oauthAccessDeniedToResourceServerError": "Le serveur d'authentification n'autorise pas l'accès à cette ressource", 
+                "oauthInternalServerError": "Erreur du serveur d'authentification", 
+                "oauthInvalidTokenError": "Erreur de validation du token d'authentification", 
                 "unauthenticated": "Nom d'utilisateur ou mot de passe invalide", 
                 "unauthorized": "Accès non autorisé ! Vos identifiants sont actuellement en cours d'utilisation et ont atteint le nombre maximum d'accès simultanés.", 
                 "unauthorizedSessionType": "Accès non autorisé ! Vérifiez que votre souscription vous autorise l'accès à toutes les applications imajing."
@@ -292,8 +295,12 @@ jQuery.imajnet = {
     }, 
     "productOf": "Imajnet&#174; est un web service conçu et édité par imajing s.a.s, France", 
     "projectedLayers": {
+        "addAttribute": "Ajouter un nouvel attribut", 
+        "addButton": "Ajouter", 
         "groundProjection": "Projection au sol", 
-        "heightOffset": "Décalage en hauteur"
+        "heightOffset": "Décalage en hauteur", 
+        "title": "Couches projetées", 
+        "zFromAttribute": "Obtenir le Z depuis un attribut"
     }, 
     "security": {
         "logout": "Déconnexion", 
