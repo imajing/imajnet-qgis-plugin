@@ -1250,10 +1250,6 @@ Imajnet3dPosition.showPosition = function () {
 	Imajnet3dPosition.isActive = false;
 }
 
-ImajnetROI.onROICreated = function (roi, image, photogrammetryInfo) {
-	pyImajnetCreateROI(roi, image, photogrammetryInfo);
-}
-
 
 /////////////////////////////////////////////////
 //// ROI temporary /////////////////////////////

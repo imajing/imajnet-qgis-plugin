@@ -7,7 +7,12 @@
 			"labelsPlaceholder": "Add labels",
 			"validate": "Validate",
 			"invalidate": "Invalidate",
-			"validationCommentPlaceholder": "Validation comment"
+			"validationCommentPlaceholder": "Validation comment",
+			"errors": {
+				"save": "Error saving ROI",
+				"delete": "Error deleting ROI",
+				"label": "Error adding label"
+			}
 		},
 		"map": {
 			"OSM": "Open Street Map",
@@ -403,7 +408,8 @@
 			"ja": "日本語"
 		},
 		"errors": {
-			"genericError": "Please contact administrator! Code:"
+			"genericError": "Please contact administrator! Code:",
+			"unknownError": "An unknown error has occurred"
 		}
 	};
 })(jQuery);
