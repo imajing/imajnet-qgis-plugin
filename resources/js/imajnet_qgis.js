@@ -671,6 +671,7 @@ ImajnetPlugin.onImageChange = function (position) {
 	} else {
 		ImajnetPlugin.showImajnetItem('imajnetContainer');
 		Nigsys.hideLoading(jQuery('body'));
+		ImajnetUI.hideContextMenu();
 	}
 
 	if (ImajnetPlugin.currentLayout == ImajnetPlugin.LAYOUT_DEFAULT && !ImageControler.currentImageControl.isFastNavigation) {
