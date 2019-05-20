@@ -653,7 +653,7 @@ ImajnetPlugin.onImageChange = function (position) {
 			ImajnetUI.clipboardOpenCommentId = id;
 			jQuery('.imajnetClipboardTextareaComment').hide();
 			jQuery('.imajnetClipboardCommentContainer').show();
-			jQuery('#imajnetClipboardComment_' + id).hide();
+			//jQuery('#imajnetClipboardComment_' + id).hide();
 			var commentContainer = jQuery('#LRSDoubleClickComment_' + id);
 			var textareaContent = commentContainer.length != 0 ? commentContainer.html() : '';
 			var textarea = jQuery('textarea#textAreaEditClipboardComment_' + id);
@@ -665,7 +665,7 @@ ImajnetPlugin.onImageChange = function (position) {
 			//		    });
 			textarea.css('top', parentPosition.top).css('left', parentPosition.left);
 			jQuery('#imajnetClipboardTextareaComment_' + id).show();
-			textarea.focus();
+			textarea.show().focus();
 		}
 		isFirstLoad = false;
 	} else {
@@ -937,7 +937,10 @@ ImajnetPlugin.onWindowResize = function (event) {
 	if (!jQuery('body').hasClass(ImajnetPlugin.currentLayout)) {
 		jQuery('body').removeAttr('class').addClass(ImajnetPlugin.currentLayout);
 	}
-	ImajnetUI.onImageResize();
+	//ImajnetUI.onImageResize();
+	var containerWidth = ImajnetUI.imageContainer.parent().width();
+	var containerHeight = ImajnetUI.imageContainer.parent().height();
+	ImajnetUI.resizeImageElements(containerWidth, containerHeight, true);
 
 	//	var width = jQuery(this).width() - 10;//50 is padding and margins
 	//	var height = width / ImajnetUI.getImageAspectRatio();
@@ -1258,4 +1261,23 @@ pyImajnetCreateROI = function (roi, image, photogrammetryInfo) {
 	var imageUrl = (ImajnetAPI.buildImageURLWithResolution(image, ImajnetSettings.imajnetImageResolutions[3]));
 
 	return PyImajnet.createROI(roi, image, photogrammetryInfo, imageUrl);
+}
+
+onTabChange = function (event, ui) {
+	if (!ui.newPanel[0]) {
+		return;
+	}
+	var tabId = ui.newPanel[0].id;
+	if (tabId == 'lrsSeatchTab') {
+		ImajnetPlugin.onImajnetControlPressed(null, 'searchLRS');
+	} else if (tabId == 'clipboardTab') {
+		ImajnetPlugin.onImajnetControlPressed(null, 'showClipboard');;
+	} else if (tabId == 'newsTab') {
+		ImajnetPlugin.onImajnetControlPressed(null, 'showNews');
+	} else if (tabId == 'clayerProjectionTab') {
+
+	}
+	ImajnetUI.stopSwipeNavigation(true, true);
+	jQuery('ul.ui-autocomplete').hide();
+	jQuery('.textAreaEditClipboardComment').hide();
 }

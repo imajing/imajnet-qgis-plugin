@@ -150,23 +150,7 @@
 
 	jQuery(function() {
 		jQuery("#imajnetTabs").tabs({
-			activate: function(event,ui){
-				if(!ui.newPanel[0]){
-					return;
-				}
-				var tabId=ui.newPanel[0].id; 
-				if(tabId == 'lrsSeatchTab' ){
-					ImajnetPlugin.onImajnetControlPressed(null, 'searchLRS');
-				} else if(tabId == 'clipboardTab' ){
-					ImajnetPlugin.onImajnetControlPressed(null, 'showClipboard');;
-				} else if(tabId == 'newsTab' ){
-					ImajnetPlugin.onImajnetControlPressed(null, 'showNews');
-				} else if(tabId == 'clayerProjectionTab' ){
-					
-				}
-				ImajnetUI.stopSwipeNavigation(true, true);
-				jQuery('ul.ui-autocomplete').hide();
-			}
+			activate: onTabChange
 		});
 		
 		jQuery('#imajnetTabs').tabs().find('.ui-tabs-nav li').off('keydown');
