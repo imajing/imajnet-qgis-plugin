@@ -3,15 +3,23 @@
 		"oldSiteMessage": "Due to Google decision to stop Google Maps v2 services, we are not able to give you access to the app.imajnet.net website.\nWe suggest that you migrate to the most recent website on web.imajnet.net.\nThis new website has been validated on many browsers. However, if you experience any problem, please report it at support@imajnet.net with your problem description and the exact browser version you are using.\n\nWe wish you a good navigation,\n\nThe Imajing team",
 		"noFullAccessMessage": " Your imajnet subscription type does not allow you to access the website. A full subscription is required.",
 		"imajnetNotAvailable": "Imajnet is not available",
-		"roiInfoBox": {
+		"roi": {
 			"labelsPlaceholder": "Add labels",
 			"validate": "Validate",
 			"invalidate": "Invalidate",
 			"validationCommentPlaceholder": "Validation comment",
 			"errors": {
-				"save": "Error saving ROI",
-				"delete": "Error deleting ROI",
+				"save": "Error saving object",
+				"delete": "Error deleting object",
 				"label": "Error adding label"
+			},
+			"contextMenu": {
+				"addROI": "Add ROI to object"
+			},
+			"delete": {
+				"text": "This object is visibile in multiple images! What do you want to do?",
+				"deleteFromImage": "Delete from current image",
+				"deleteObject": "Delete object"
 			}
 		},
 		"map": {

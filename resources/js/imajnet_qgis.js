@@ -1005,18 +1005,7 @@ ImajnetPlugin.onImajnetActivated = function () {
 	//go to the map center
 	var mapCenter = PyImajnet.getMapCenter();
 	Imajnet.activateImajnetControl(null, 'closestImage');
-
-	var lastPosition = Nigsys.getCookie('IMAJNET', 'LAST_POSITION');
-
-	//Pass the coordinates to the imajnet library
-	if (lastPosition) {
-		ImajnetAPI.setImajnetImage({
-			position: lastPosition
-		});
-	} else {
-		//ImajnetPlugin.hideImajnetItem('imajnetContainer');
-		ImajnetMap.mapClickHandler(mapCenter);
-	}
+	ImajnetMap.mapClickHandler(mapCenter);
 
 	if (ImajnetPlugin.currentLayout !== ImajnetPlugin.LAYOUT_DEFAULT) {
 		jQuery("#imajnetTabs").tabs({
@@ -1095,19 +1084,12 @@ ImajnetPlugin.getLocalStorageKeys = function () {
 		var obj = new Object();
 		obj.name = key;
 		obj.value = localStorage.getItem(key);
-		if (key.indexOf('IMAJNET_LAST_POSITION') !== -1 || key.indexOf(ImajnetUser.getUsername() + '_') == -1) {
-			continue;
-		}
 		if (key.indexOf('IMAJNET_PROJECTED_LAYERS') !== -1 || key.indexOf('IMAJNET_CLIPBOARD') !== -1) {
 			keys.project.push(obj);
 		} else {
 			keys.global.push(obj)
 		}
 	}
-	keys.project.push({
-		name: ImajnetUser.getUsername() + '_IMAJNET_LAST_POSITION',
-		value: JSON.stringify(ImajnetMap.currentPosition)
-	});
 	return keys;
 }
 
