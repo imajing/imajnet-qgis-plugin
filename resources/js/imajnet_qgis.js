@@ -127,16 +127,16 @@ ImajnetPlugin.showLogin = function (isFromIdle) {
 			return;
 		}
 
-		var oldSettings = PyImajnet.loadSettings().imajnetLoginSettings;
+		var oldSettings = ImajnetPlugin.loadSettings().imajnetLoginSettings;
 		if (isFromIdle && settings.username === oldSettings.username && settings.password === oldSettings.password && settings.serverUrl === oldSettings.serverUrl) {
 			window.location.reload();
 		}
 
-		PyImajnet.saveSettings(settings, {}, {});
+		ImajnetPlugin.saveSettings(settings, {}, {});
 		ImajnetPlugin.activateImajnet();
 	});
 
-	var imajnetLoginSettings = PyImajnet.loadSettings().imajnetLoginSettings;
+	var imajnetLoginSettings = ImajnetPlugin.loadSettings().imajnetLoginSettings;
 	if (imajnetLoginSettings.username && imajnetLoginSettings.password) {
 		jQuery('#username').val(imajnetLoginSettings.username);
 		jQuery('#password').val(imajnetLoginSettings.password);
@@ -162,7 +162,7 @@ ImajnetPlugin.activateImajnet = function () {
 	};
 	Imajnet.setLanguage(PyImajnet.getLocale()).always(function () {
 
-		var settings = PyImajnet.loadSettings();
+		var settings = ImajnetPlugin.loadSettings();
 		var imajnetLoginSettings = settings.imajnetLoginSettings;
 		var imajnetProjectSettings = settings.imajnetProjectSettings;
 		var imajnetGlobalSettings = settings.imajnetGlobalSettings;
@@ -197,7 +197,7 @@ ImajnetPlugin.activateImajnet = function () {
 			imajnetLoginSettings.serverUrl = 'https://service.imajnet.net';
 		}
 
-		PyImajnet.saveSettings(imajnetLoginSettings, {}, {});
+		ImajnetPlugin.saveSettings(imajnetLoginSettings, {}, {});
 		if (!imajnetLoginSettings || !imajnetLoginSettings.username || !imajnetLoginSettings.password) {
 			ImajnetPlugin.showLogin();
 			return;
@@ -269,10 +269,10 @@ function doLogout(keepSettings, isFromIdle) {
 	deactivateImajnet().done(function () {
 		window.localStorage.clear(); //we keep localstorage in qgis
 		if (!keepSettings) {
-			var imajnetLoginSettings = PyImajnet.loadSettings().imajnetLoginSettings;
+			var imajnetLoginSettings = ImajnetPlugin.loadSettings().imajnetLoginSettings;
 			delete imajnetLoginSettings.username;
 			delete imajnetLoginSettings.password;
-			PyImajnet.saveSettings(imajnetLoginSettings, {}, {});
+			ImajnetPlugin.saveSettings(imajnetLoginSettings, {}, {});
 		}
 		ImajnetUrl.deleteUrlParams();
 		if (isFromIdle) {
@@ -1083,7 +1083,7 @@ ImajnetPlugin.getLocalStorageKeys = function () {
 	for (var key in localStorage) {
 		var obj = new Object();
 		obj.name = key;
-		obj.value = localStorage.getItem(key);
+		obj.value = localStorage.getItem(key).replace('""', '"');
 		if (key.indexOf('IMAJNET_PROJECTED_LAYERS') !== -1 || key.indexOf('IMAJNET_CLIPBOARD') !== -1) {
 			keys.project.push(obj);
 		} else {
@@ -1094,7 +1094,31 @@ ImajnetPlugin.getLocalStorageKeys = function () {
 }
 
 ImajnetPlugin.resetSettings = function () {
-	PyImajnet.saveSettings([0], [0], [0]);
+	ImajnetPlugin.saveSettings([0], [0], [0]);
+}
+
+ImajnetPlugin.saveSettings = function (imajnetLoginSettings, imajnetProjectSettings, imajnetGlobalSettings) {
+	return PyImajnet.saveSettings(JSON.stringify(imajnetLoginSettings), JSON.stringify(imajnetProjectSettings), JSON.stringify(imajnetGlobalSettings));
+}
+
+ImajnetPlugin.loadSettings = function () {
+	var result = {
+		imajnetLoginSettings: {},
+		imajnetProjectSettings: {},
+		imajnetGlobalSettings: {}
+	}
+	try {
+		var settings = PyImajnet.loadSettings();
+		for (var prop in settings) {
+			var parsed = JSON.parse(settings[prop]);
+			if (Object.keys(parsed).length === 0) {
+				continue;
+			}
+			settings[prop] = parsed;
+		}
+		result = settings;
+	} catch (e) {}
+	return result;
 }
 
 onProjectChange = function () {
@@ -1107,7 +1131,7 @@ onProjectChange = function () {
 onProjectSaving = function () {
 	console.log('onProjectSaving');
 	var keys = ImajnetPlugin.getLocalStorageKeys();
-	PyImajnet.saveSettings({}, keys.project, keys.global);
+	ImajnetPlugin.saveSettings({}, keys.project, keys.global);
 }
 
 onProjectOpened = function () {
