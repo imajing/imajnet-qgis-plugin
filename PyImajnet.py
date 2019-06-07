@@ -447,13 +447,13 @@ class PyImajnet(QWidget):
         
         settings = dict()
         
-        settings["imajnetLoginSettings"]= json.loads(proj.readEntry("imajnet", "imajnetLoginSettings", s.value("imajnet/imajnetLoginSettings","{}"))[0])
-        settings["imajnetProjectSettings"]= json.loads(proj.readEntry("imajnet", "imajnetProjectSettings", "{}")[0])
-        settings["imajnetGlobalSettings"]= json.loads(s.value("imajnet/imajnetGlobalSettings","{}"))
+        settings["imajnetLoginSettings"]= proj.readEntry("imajnet", "imajnetLoginSettings", s.value("imajnet/imajnetLoginSettings","{}"))[0]
+        settings["imajnetProjectSettings"]= proj.readEntry("imajnet", "imajnetProjectSettings", "{}")[0]
+        settings["imajnetGlobalSettings"]= s.value("imajnet/imajnetGlobalSettings","{}")
         
         return self.returnPyDictToJs(settings)
     
-    @pyqtSlot('QVariantMap','QVariantMap','QVariantMap') 
+    @pyqtSlot('QString','QString','QString') 
     def saveSettings(self, imajnetLoginSettings,imajnetProjectSettings,imajnetGlobalSettings):
         ImajnetLog.debug("saveSettings: {},{},{}".format(imajnetLoginSettings,imajnetProjectSettings,imajnetGlobalSettings))
         s = QSettings()
@@ -461,17 +461,17 @@ class PyImajnet(QWidget):
         
         
         
-        if imajnetLoginSettings is not None and len(imajnetLoginSettings) > 0:
-            proj.writeEntry("imajnet", "imajnetLoginSettings", json.dumps(imajnetLoginSettings))
-            s.setValue("imajnet/imajnetLoginSettings", json.dumps(imajnetLoginSettings))
+        if imajnetLoginSettings is not None and len(imajnetLoginSettings) > 2:
+            proj.writeEntry("imajnet", "imajnetLoginSettings", imajnetLoginSettings)
+            s.setValue("imajnet/imajnetLoginSettings", imajnetLoginSettings)
 
         #todo: write them separately (also read)
-        if imajnetProjectSettings is not None and len(imajnetProjectSettings) > 0:
-            proj.writeEntry("imajnet", "imajnetProjectSettings", json.dumps(imajnetProjectSettings))
+        if imajnetProjectSettings is not None and len(imajnetProjectSettings) > 2:
+            proj.writeEntry("imajnet", "imajnetProjectSettings", imajnetProjectSettings)
        
         #todo: write them separately (also read)
-        if imajnetGlobalSettings is not None and len(imajnetGlobalSettings) > 0:
-            s.setValue("imajnet/imajnetGlobalSettings", json.dumps(imajnetGlobalSettings))
+        if imajnetGlobalSettings is not None and len(imajnetGlobalSettings) > 2:
+            s.setValue("imajnet/imajnetGlobalSettings", imajnetGlobalSettings)
     
         
     @pyqtSlot(result=str) 
