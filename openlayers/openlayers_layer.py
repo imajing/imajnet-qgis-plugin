@@ -25,12 +25,13 @@ from qgis.PyQt.QtCore import (QUrl, Qt, QMetaObject, QTimer, QEventLoop,
 from qgis.PyQt.QtGui import QImage, QPainter
 from qgis.PyQt.QtWebKitWidgets import QWebPage, QWebView
 from qgis.core import (QgsMapLayerRenderer, Qgis, QgsMessageLog,
-                       QgsPluginLayer, QgsRectangle)
+                       QgsPluginLayer, QgsRectangle, QgsPluginLayerType)
 from PyQt5.QtWebKit import QWebElement, QWebSettings
 import sys, os
 from ..ImajnetWebView import ImajnetWebView
-
-
+from .imajnet import ImajnetTilesMapLayer
+from inspect import ismethod
+#from ..PyImajnet import PyImajnet
 #sys.path.append(os.path.join(os.path.dirname(__file__), '../imajnet-qgis-plugin/', 'PyImajnet')) import PyImajnet
 
 debuglevel = 1  # 0 (none) - 4 (all)
@@ -54,13 +55,12 @@ def safeEvaluateJavaScript(frame,command):
 class OLWebPage(QWebPage):
     def __init__(self, parent=None, pyImajnet=None):
         QWebPage.__init__(self, parent)
-        self.pyImajnet = pyImajnet;
+        self.pyImajnet = pyImajnet
         self.populateJavaScriptWindowObject()
         self.loaded = False
         ImajnetLog.info("OLWebPage INIT!!")
         self.setNetworkAccessManager(pyImajnet.networkAccessManager)
-      
-        
+
         self.extent = None
         self.olResolutions = None
         self.lastExtent = None
@@ -407,7 +407,7 @@ class OpenlayersRenderer(QgsMapLayerRenderer):
 
 class OpenlayersLayer(QgsPluginLayer):
 
-    LAYER_TYPE = "openlayers"
+    LAYER_TYPE = "Imajnet"
     LAYER_PROPERTY = "ol_layer_type"
     MAX_ZOOM_LEVEL = 21
     SCALE_ON_MAX_ZOOM = 13540  # QGIS scale for 72 dpi
@@ -415,24 +415,29 @@ class OpenlayersLayer(QgsPluginLayer):
     def __init__(self, iface, pyImajnet):
         QgsPluginLayer.__init__(self,
                                 OpenlayersLayer.LAYER_TYPE,
-                                "OpenLayers plugin layer")
+                                OpenlayersLayer.LAYER_TYPE)
+        
+        self.setName(OpenlayersLayer.LAYER_TYPE)
         self.setValid(True)
-        self.layerType = None
-
+        self.layerType = ImajnetTilesMapLayer()
+        coordRefSys = self.layerType.coordRefSys(pyImajnet.canvasCrs())
+        self.setCrs(coordRefSys)
+        self.setMaximumScale(0)
+        self.setMinimumScale(32000000)
+        self.setScaleBasedVisibility(True)
+        
         self.iface = iface 
         self.pyImajnet = pyImajnet
         
         self.olWebPage = OLWebPage(self, pyImajnet=self.pyImajnet)
         self.m_view = ImajnetWebView()
-        self.olWebPage.m_view=self.m_view
-        
+        self.olWebPage.m_view=self.m_view  
         
 
     def setLayerType(self, layerType):
         qDebug(" setLayerType: %s" % layerType.layerTypeName)
         self.layerType = layerType
-        self.setCustomProperty(OpenlayersLayer.LAYER_PROPERTY,
-                               layerType.layerTypeName)
+        self.setCustomProperty(OpenlayersLayer.LAYER_PROPERTY, layerType.layerTypeName)
         coordRefSys = self.layerType.coordRefSys(None)  # FIXME
         self.setCrs(coordRefSys)
         # TODO: get extent from layer type
@@ -442,3 +447,15 @@ class OpenlayersLayer(QgsPluginLayer):
     def createMapRenderer(self, context):
         return OpenlayersRenderer(self, context,
                                   self.olWebPage, self.layerType)
+    #def readXml(self, node):
+    #    return True
+
+    #def writeXml(self, node, doc, x):
+    #    return True
+    
+    def setTransformContext(self,transformContext ):
+        if self.dataProvider() is not None :
+            setTransformContext = getattr(self.dataProvider(), "setTransformContext", None)
+            if callable(setTransformContext):
+                 self.dataProvider().setTransformContext( transformContext )
+ 

@@ -33,8 +33,8 @@ from PyQt5.QtWebKit import QWebElement, QWebSettings
 from numpy import double
 # from PySide import QtGui, QtCore, QtWebKit
 from PyQt5.QtWidgets import QApplication, QSplitter, QVBoxLayout, QWidget
-from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkCookieJar
-
+from PyQt5.QtNetwork import QNetworkRequest, QNetworkAccessManager, QNetworkCookieJar
+from qgis.core import QgsNetworkAccessManager
 from qgis.utils import iface
 from .ImajnetUtils import ImajnetUtils
 from .PyImajnet import PyImajnet
@@ -93,12 +93,10 @@ class QGisImajnetPluginDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         
         # make js verbose
         page = QWebPage()
-        manager = QNetworkAccessManager()
-        cookieJar = QNetworkCookieJar()
-        
-        manager.setCookieJar(cookieJar)
-        page.setNetworkAccessManager(manager)
+        manager = plugin.manager #QgsNetworkAccessManager.instance() #QNetworkAccessManager()
        
+        page.setNetworkAccessManager(manager)
+              
         self.m_view.setPage(page)
         
         QWidget.__init__(self, parent=parent)
@@ -112,6 +110,7 @@ class QGisImajnetPluginDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         # -- load the local htm page
         # connect the script injection at page reload        
         self._PyImajnet = PyImajnet(self.m_view.page(),self.imajnetPlugin, self.iface)
+        PyImajnet.instance = self._PyImajnet
         self._PyImajnet.networkAccessManager = manager
 
         # Effective load of the html entry point
@@ -121,10 +120,8 @@ class QGisImajnetPluginDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         
         self.setMinimumSize(QSize(600, 600))
         #----------------------- End user part ---------------------------
+          
 
-   
- 
-        
     def closeEvent(self, event):
         """
         Method call when closing the plugin

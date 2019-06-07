@@ -43,6 +43,10 @@ from qgis.core import *
 from .ImajnetMapTool import  ImajnetMapTool
 from .ImajnetLog import ImajnetLog
 from .QGisImajnetPluginAboutWindow import QGisImajnetPluginAboutWindow
+from .PyImajnet import ImajnetPluginLayerType 
+from .openlayers.openlayers_layer import OpenlayersLayer
+
+       
 class QGisImajnetPlugin:
     """QGIS Plugin Implementation."""
     autoInitDebugWindow = False
@@ -92,8 +96,20 @@ class QGisImajnetPlugin:
         self.mapDebugWidget = None
         self.imajnetMapTool = None
         self.aboutDialog = None
-
-
+        self.pluginLayerRegistry = QgsApplication.pluginLayerRegistry ()
+        
+        # Register plugin layer type
+        res = self.pluginLayerRegistry.addPluginLayerType(ImajnetPluginLayerType(self.iface))
+        #ImajnetLog.error("ImajnetPluginLayerType: {}".format(res))
+        
+        self.manager = QgsNetworkAccessManager.instance() #QNetworkAccessManager()
+        self.cookieJar = self.manager.cookieJar()
+        if self.cookieJar is None:
+            self.cookieJar = QNetworkCookieJar()
+            #QgsNetworkAccessManager.instance().setCookieJar(self.cookieJar)
+            self.manager.setCookieJar(self.cookieJar)
+        
+         
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
         """Get the translation for a string using Qt translation API.
@@ -191,7 +207,6 @@ class QGisImajnetPlugin:
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
-
         #icon_path = ':/plugins/QGisImajnetPlugin/icon.png'
         icon_path = ':/plugins/imajnet-qgis-plugin/resources/img/icon.png'
         self.add_action(
@@ -369,7 +384,9 @@ class QGisImajnetPlugin:
         if self.aboutDialog :
             self.aboutDialog = None
             #del self.aboutDialog
-            
+        
+        self.pluginLayerRegistry.removePluginLayerType(OpenlayersLayer.LAYER_TYPE)
+        #ImajnetLog.error("** UNLOADED")
         ImajnetLog.close()
         
 
@@ -437,7 +454,6 @@ class QGisImajnetPlugin:
         else:
                 self.mapDebugWidget.show()
     #-------------------------------------------------------------------------
-    
     
     def on_closestImage_click(self):
         self.enableImajnetMapTool(False);
