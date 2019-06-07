@@ -188,7 +188,8 @@ class MarkerManager(QObject):
         #fillOpacity =255
         ImajnetLog.debug("jsFillOpacity: {}".format(jsFillOpacity))
         if jsFillOpacity != None:
-           fillOpacity = float(jsFillOpacity) * 255
+           fillOpacity = float(jsFillOpacity) 
+           #* 255
            fillColor.setAlphaF(fillOpacity)
         
         strokeWidth =2
