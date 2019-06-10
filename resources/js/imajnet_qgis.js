@@ -219,7 +219,7 @@ ImajnetPlugin.activateImajnet = function () {
 			language: PyImajnet.getLocale(),
 			activateImajnet: true,
 			clipboardActive: true,
-			metadata: 'imajnet-qgis-plugin',
+			metadata: 'imajnet-qgis-plugin ' + PyImajnet.version(),
 			unit: 'm',
 			goToClosestPointOfInterest: false,
 			sessionType: 'FULL'
