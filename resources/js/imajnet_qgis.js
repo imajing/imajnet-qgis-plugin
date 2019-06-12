@@ -1081,6 +1081,9 @@ ImajnetPlugin.getLocalStorageKeys = function () {
 	}
 
 	for (var key in localStorage) {
+		if(key.indexOf('IMAJNET')==-1 && key.indexOf('cookieWarning')==-1){
+			continue;
+		}
 		var obj = new Object();
 		obj.name = key;
 		obj.value = localStorage.getItem(key).replace('""', '"');
