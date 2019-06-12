@@ -44,7 +44,7 @@ from .ImajnetMapTool import  ImajnetMapTool
 from .ImajnetLog import ImajnetLog
 from .QGisImajnetPluginAboutWindow import QGisImajnetPluginAboutWindow
 from .PyImajnet import ImajnetPluginLayerType 
-from .openlayers.openlayers_layer import OpenlayersLayer
+from .openlayers.openlayers_layer import ImajnetOpenlayersLayer
 
        
 class QGisImajnetPlugin:
@@ -96,7 +96,7 @@ class QGisImajnetPlugin:
         self.mapDebugWidget = None
         self.imajnetMapTool = None
         self.aboutDialog = None
-        self.pluginLayerRegistry = QgsApplication.pluginLayerRegistry ()
+        self.pluginLayerRegistry = QgsApplication.pluginLayerRegistry()
         
         # Register plugin layer type
         res = self.pluginLayerRegistry.addPluginLayerType(ImajnetPluginLayerType(self.iface))
@@ -385,7 +385,7 @@ class QGisImajnetPlugin:
             self.aboutDialog = None
             #del self.aboutDialog
         
-        self.pluginLayerRegistry.removePluginLayerType(OpenlayersLayer.LAYER_TYPE)
+        self.pluginLayerRegistry.removePluginLayerType(ImajnetOpenlayersLayer.LAYER_TYPE)
         #ImajnetLog.error("** UNLOADED")
         ImajnetLog.close()
         

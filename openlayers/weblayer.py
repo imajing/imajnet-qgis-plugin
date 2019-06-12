@@ -26,7 +26,7 @@ from qgis.core import Qgis as QGis, QgsCoordinateReferenceSystem
 import os
 from ..ImajnetLog import ImajnetLog
 
-class WebLayer:
+class ImajnetWebLayer:
     """Base class for OpenLayers layers"""
 
     displayName = None
@@ -81,7 +81,7 @@ class WebLayer:
         return coordRefSys
 
 
-class WebLayer3857(WebLayer):
+class ImajnetWebLayer3857(ImajnetWebLayer):
 
     epsgList = [3857]
 
@@ -107,7 +107,7 @@ class WebLayer3857(WebLayer):
         return coordRefSys
     
     
-class WebLayer900913(WebLayer):
+class ImajnetWebLayer900913(ImajnetWebLayer):
 
     epsgList = [900913]
 

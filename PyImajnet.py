@@ -17,10 +17,11 @@ from numpy import double
 # from PySide import QtGui, QtCore, QtWebKit
 from PyQt5.QtWidgets import QApplication, QSplitter, QVBoxLayout, QWidget, QFileDialog
 from qgis.utils import iface
-from qgis.core import QgsDataSourceUri, QgsAuthMethodConfig,QgsAuthManager, QgsNetworkAccessManager, QgsApplication, QgsVectorFileWriter, QgsFields, QgsRenderContext,QgsProject, QgsMapLayer,QgsVectorDataProvider, QgsWkbTypes, QgsRasterLayer, QgsCoordinateReferenceSystem, QgsCoordinateTransform
+from qgis.core import Qgis, QgsDataSourceUri, QgsAuthMethodConfig,QgsAuthManager, QgsNetworkAccessManager, QgsApplication, QgsVectorFileWriter, QgsFields, QgsRenderContext,QgsProject, QgsMapLayer,QgsVectorDataProvider, QgsWkbTypes, QgsRasterLayer, QgsCoordinateReferenceSystem, QgsCoordinateTransform
 from .ImajnetUtils import ImajnetUtils
 from .MarkerManager import MarkerManager
 from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkCookieJar, QNetworkRequest
+from .QgisImajnetPluginVersion import QgisImajnetPluginVersion
 
 import json
 # from .QGisImajnetPlugin import QGisImajnetPlugin
@@ -39,17 +40,17 @@ from .ImajnetLog import ImajnetLog
 #from .openlayers.ImajnetPluginLayerType import ImajnetPluginLayerType
 
 
-from .openlayers.openlayers_layer import OpenlayersLayer
+from .openlayers.openlayers_layer import ImajnetOpenlayersLayer
 
 class ImajnetPluginLayerType(QgsPluginLayerType):
 
   def __init__(self, iface):
-    QgsPluginLayerType.__init__(self, OpenlayersLayer.LAYER_TYPE)
+    QgsPluginLayerType.__init__(self, ImajnetOpenlayersLayer.LAYER_TYPE)
     self.iface = iface
 
   def createLayer(self):
-    ImajnetLog.info("ImajnetPluginLayerType createLayer called")
-    return OpenlayersLayer(self.iface,PyImajnet.instance)
+    #ImajnetLog.error("ImajnetPluginLayerType createLayer called")
+    return ImajnetOpenlayersLayer(self.iface,PyImajnet.instance)
 
   def showLayerProperties(self, layer):
      return False
@@ -206,7 +207,7 @@ class PyImajnet(QWidget):
     def addImajnetLayerToMap(self, result=str):
         ImajnetLog.info("addImajnetLayerToMap")
               
-        imajnetPluginLayerType = self._plugin.pluginLayerRegistry.pluginLayerType(OpenlayersLayer.LAYER_TYPE)
+        imajnetPluginLayerType = self._plugin.pluginLayerRegistry.pluginLayerType(ImajnetOpenlayersLayer.LAYER_TYPE)
         ImajnetLog.info("pluginLayer - {}".format(imajnetPluginLayerType.name()))
 
 
@@ -216,14 +217,14 @@ class PyImajnet(QWidget):
         #uri="url=http://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png&zmax=19&zmin=0&type=xyz"
         #uri="type=xyz&zmax=19&zmin=0&url=https://carto3.imajnet.net/service/api/tile/{\"tile\":{\"x\":{x},\"y\":{y},\"zoom\":{z}},\"timeframe\":null}"
         
-        authMgr = QgsApplication.authManager()
+        #authMgr = QgsApplication.authManager()
         # set alice PKI data
-        p_config = QgsAuthMethodConfig()
-        p_config.setName("imajnetTestBasicAuth")
-        p_config.setMethod("Basic")
-        p_config.setUri("https://service.imajnet.net")
-        p_config.setConfig("username", "dummy" )
-        p_config.setConfig("password", "dummy" )
+        #p_config = QgsAuthMethodConfig()
+        #p_config.setName("imajnetTestBasicAuth")
+        #p_config.setMethod("Basic")
+        #p_config.setUri("https://service.imajnet.net")
+        #p_config.setConfig("username", "dummy" )
+        #p_config.setConfig("password", "dummy" )
         # check if method parameters are correctly set
         #assert p_config.isValid()
 
@@ -257,7 +258,7 @@ class PyImajnet(QWidget):
 
         #if layer.isValid():
  
-        self.setMapCrs(self.canvasCrs())
+        #self.setMapCrs(self.canvasCrs())
         QgsProject.instance().addMapLayer(self._imajnetTilesLayer)
 
         
@@ -535,7 +536,7 @@ class PyImajnet(QWidget):
         result = dict()
         result["layers"] = jsLayers
         return self.returnPyDictToJs(result)
-    
+
     @pyqtSlot('QVariantMap','QVariantMap', "QString", "QString",result=bool) 
     def addGeometryToLayer(self, jsLayer, jsGeom, zAttributeName, zValue):
         ImajnetLog.debug("addGeometryToLayer: {},{}".format(jsLayer,jsGeom))
@@ -761,7 +762,7 @@ class PyImajnet(QWidget):
         # remove previously saved layer
         rootGroup = self.iface.layerTreeView().layerTreeModel().rootGroup()
         for layer in QgsProject.instance().mapLayers().values():
-            if layer.type() == QgsMapLayer.PluginLayer and layer.pluginLayerType() == OpenlayersLayer.LAYER_TYPE:
+            if layer.type() == QgsMapLayer.PluginLayer and layer.pluginLayerType() == ImajnetOpenlayersLayer.LAYER_TYPE:
                 QgsProject.instance().removeMapLayer(layer)
 
     #TODO: hook up to projet saving, it is called just before save
@@ -944,4 +945,7 @@ class PyImajnet(QWidget):
         else:
             ImajnetLog.error('unable to add ROI to layer, res:{}'.format(res));
 
+    @pyqtSlot(result=str) 
+    def version(self):
+        return '{}/{}'.format(QgisImajnetPluginVersion.version,Qgis.QGIS_VERSION)
             

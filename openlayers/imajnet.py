@@ -20,13 +20,13 @@ email                : pka at sourcepole.ch
  ***************************************************************************/
 """
 
-from .weblayer import WebLayer3857,WebLayer900913
+from .weblayer import ImajnetWebLayer3857,ImajnetWebLayer900913
 
 
-class ImajnetTilesMapLayer(WebLayer3857):
+class ImajnetTilesMapLayer(ImajnetWebLayer3857):
 
     emitsLoadEnd = True
 
     def __init__(self):
-        WebLayer3857.__init__(self, name='Imajnet tiles', html='imajnetOl2Map.html')
+        ImajnetWebLayer3857.__init__(self, name='Imajnet tiles', html='imajnetOl2Map.html')
 

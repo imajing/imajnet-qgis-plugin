@@ -52,7 +52,7 @@ def safeEvaluateJavaScript(frame,command):
     except:
         return None
         
-class OLWebPage(QWebPage):
+class ImajnetOLWebPage(QWebPage):
     def __init__(self, parent=None, pyImajnet=None):
         QWebPage.__init__(self, parent)
         self.pyImajnet = pyImajnet
@@ -99,7 +99,7 @@ class OLWebPage(QWebPage):
         except:
             return None
 
-class OpenlayersController(QObject):
+class ImajnetOpenlayersController(QObject):
     """
     Helper class that deals with QWebPage.
     The object lives in GUI thread, its request() slot is asynchronously called
@@ -263,6 +263,10 @@ class OpenlayersController(QObject):
         # adjust OpenLayers viewport to match QGIS extent
         olWidth = rendererContext.extent().width() / olRes
         olHeight = rendererContext.extent().height() / olRes
+        if olWidth == float("inf") :
+            olWidth = sys.maxsize
+        if olHeight == float("inf") :
+            olHeight = sys.maxsize
         debug("    adjust viewport: %f -> %f: %f x %f" % (qgisRes,
                                                           olRes, olWidth,
                                                           olHeight), 3)
@@ -363,14 +367,14 @@ class OpenlayersController(QObject):
         self.finished.emit()
 
 
-class OpenlayersRenderer(QgsMapLayerRenderer):
+class ImajnetOpenlayersRenderer(QgsMapLayerRenderer):
     def __init__(self, layer, context, webPage, layerType):
         """ Initialize the object. This function is still run in the GUI thread.
             Should refrain from doing any heavy work.
         """
         QgsMapLayerRenderer.__init__(self, layer.id())
         self.context = context
-        self.controller = OpenlayersController(None,
+        self.controller = ImajnetOpenlayersController(None,
                                                context, webPage, layerType)
         self.loop = None
 
@@ -405,7 +409,7 @@ class OpenlayersRenderer(QgsMapLayerRenderer):
             self.loop.exit()
 
 
-class OpenlayersLayer(QgsPluginLayer):
+class ImajnetOpenlayersLayer(QgsPluginLayer):
 
     LAYER_TYPE = "Imajnet"
     LAYER_PROPERTY = "ol_layer_type"
@@ -414,14 +418,15 @@ class OpenlayersLayer(QgsPluginLayer):
 
     def __init__(self, iface, pyImajnet):
         QgsPluginLayer.__init__(self,
-                                OpenlayersLayer.LAYER_TYPE,
-                                OpenlayersLayer.LAYER_TYPE)
+                                ImajnetOpenlayersLayer.LAYER_TYPE,
+                                ImajnetOpenlayersLayer.LAYER_TYPE)
         
-        self.setName(OpenlayersLayer.LAYER_TYPE)
+        self.setName(ImajnetOpenlayersLayer.LAYER_TYPE)
         self.setValid(True)
         self.layerType = ImajnetTilesMapLayer()
         coordRefSys = self.layerType.coordRefSys(pyImajnet.canvasCrs())
         self.setCrs(coordRefSys)
+        pyImajnet.setMapCrs(coordRefSys)
         self.setMaximumScale(0)
         self.setMinimumScale(32000000)
         self.setScaleBasedVisibility(True)
@@ -429,7 +434,7 @@ class OpenlayersLayer(QgsPluginLayer):
         self.iface = iface 
         self.pyImajnet = pyImajnet
         
-        self.olWebPage = OLWebPage(self, pyImajnet=self.pyImajnet)
+        self.olWebPage = ImajnetOLWebPage(self, pyImajnet=self.pyImajnet)
         self.m_view = ImajnetWebView()
         self.olWebPage.m_view=self.m_view  
         
@@ -437,7 +442,7 @@ class OpenlayersLayer(QgsPluginLayer):
     def setLayerType(self, layerType):
         qDebug(" setLayerType: %s" % layerType.layerTypeName)
         self.layerType = layerType
-        self.setCustomProperty(OpenlayersLayer.LAYER_PROPERTY, layerType.layerTypeName)
+        self.setCustomProperty(ImajnetOpenlayersLayer.LAYER_PROPERTY, layerType.layerTypeName)
         coordRefSys = self.layerType.coordRefSys(None)  # FIXME
         self.setCrs(coordRefSys)
         # TODO: get extent from layer type
@@ -445,7 +450,7 @@ class OpenlayersLayer(QgsPluginLayer):
                                     -20037508.34, 20037508.34, 20037508.34))
 
     def createMapRenderer(self, context):
-        return OpenlayersRenderer(self, context,
+        return ImajnetOpenlayersRenderer(self, context,
                                   self.olWebPage, self.layerType)
     #def readXml(self, node):
     #    return True
