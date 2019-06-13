@@ -258,10 +258,11 @@ class MarkerManager(QObject):
         layer.clear()
         
     def removeLayerFromMap(self, layerName):
-        layer = self._layers.pop(layerName)
-        if (layer is None):
-            return
-        self.removeAllMarkersFromLayerDict(layer)
+        if layerName in self._layers:
+            layer = self._layers.pop(layerName)
+            if (layer is None):
+                return
+            self.removeAllMarkersFromLayerDict(layer)
         
     def removeAllLayersFromMap(self):        
         for layerName,layer in self._layers.items():
