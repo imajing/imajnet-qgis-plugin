@@ -222,6 +222,8 @@ class MarkerManager(QObject):
         layer=self.getLayerByName(layerName)
         if (layer is None):
             return
+        if fid not in layer:
+            return
         marker = layer.pop(fid)
         if marker is None:
             ImajnetLog.error("marker remove for inexistent fid. layer:{}, fid:{}".format(layerName,fid))
