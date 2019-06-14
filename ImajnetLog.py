@@ -12,7 +12,7 @@ class ImajnetLog(object):
     logfile = None
     filename = 'imajnet_qgis_plugin.log'
     imajnettag = 'imajnet'
-    level = 2 # 0 (none) - 4 (all)
+    level = 1 # 0 (none) - 4 (all)
   
     @staticmethod
     def writelogmessage(message, tag, level):
