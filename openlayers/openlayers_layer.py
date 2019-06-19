@@ -452,11 +452,16 @@ class ImajnetOpenlayersLayer(QgsPluginLayer):
     def createMapRenderer(self, context):
         return ImajnetOpenlayersRenderer(self, context,
                                   self.olWebPage, self.layerType)
-    #def readXml(self, node):
-    #    return True
+    
+    def readXml(self, node, doc):
+        return True
 
-    #def writeXml(self, node, doc, x):
-    #    return True
+    def writeXml(self, node, doc, x):
+        element = node.toElement()
+        # write plugin layer type to project (essential to be read from project)
+        element.setAttribute("type", "plugin")
+        element.setAttribute("name", ImajnetOpenlayersLayer.LAYER_TYPE)
+        return True
     
     def setTransformContext(self,transformContext ):
         if self.dataProvider() is not None :

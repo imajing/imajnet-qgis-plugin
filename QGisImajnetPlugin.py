@@ -43,10 +43,26 @@ from qgis.core import *
 from .ImajnetMapTool import  ImajnetMapTool
 from .ImajnetLog import ImajnetLog
 from .QGisImajnetPluginAboutWindow import QGisImajnetPluginAboutWindow
-from .PyImajnet import ImajnetPluginLayerType 
+from .PyImajnet import PyImajnet
 from .openlayers.openlayers_layer import ImajnetOpenlayersLayer
 
-       
+
+class ImajnetPluginLayerType(QgsPluginLayerType):
+
+  def __init__(self, iface, plugin):
+    QgsPluginLayerType.__init__(self, ImajnetOpenlayersLayer.LAYER_TYPE)
+    self.iface = iface
+    self.plugin = plugin
+
+  def createLayer(self):
+    #ImajnetLog.error("ImajnetPluginLayerType createLayer called")
+    if not self.plugin.pluginIsActive:
+        self.plugin.run()
+    return ImajnetOpenlayersLayer(self.iface,PyImajnet.instance)
+
+  def showLayerProperties(self, layer):
+     return False
+ 
 class QGisImajnetPlugin:
     """QGIS Plugin Implementation."""
     autoInitDebugWindow = False
@@ -99,7 +115,7 @@ class QGisImajnetPlugin:
         self.pluginLayerRegistry = QgsApplication.pluginLayerRegistry()
         
         # Register plugin layer type
-        res = self.pluginLayerRegistry.addPluginLayerType(ImajnetPluginLayerType(self.iface))
+        res = self.pluginLayerRegistry.addPluginLayerType(ImajnetPluginLayerType(self.iface,self))
         #ImajnetLog.error("ImajnetPluginLayerType: {}".format(res))
         
         self.manager = QgsNetworkAccessManager.instance() #QNetworkAccessManager()
@@ -326,14 +342,11 @@ class QGisImajnetPlugin:
         self._jumpBackwardShortAction.setShortcut(jumpBackwardShortShortcutKeys)
         
     #--------------------------------------------------------------------------
-
-    def onClosePlugin(self):
+        
+    def onClosePlugin(self, isUserAction = False):
         """Cleanup necessary items here when plugin dockwidget is closed"""
         ImajnetLog.info("** CLOSING QGisImajnetPlugin")
-
-        #disconnects
-        self.dockwidget.closingPlugin.disconnect(self.onClosePlugin)
-        self.dockwidget.hide()
+        
         if self.debugWidget != None:
             self.debugWidget.closingPlugin.disconnect(self.onClosePlugin)
             self.debugWidget.hide()
@@ -342,7 +355,10 @@ class QGisImajnetPlugin:
             self.mapDebugWidget.hide()
             
         if (self.dockwidget is not None):
-            self.dockwidget.cleanup()
+            self.dockwidget.cleanup(isUserAction)
+            #disconnects
+            self.dockwidget.closingPlugin.disconnect(self.onClosePlugin)
+            self.dockwidget.hide()
             self.iface.removeDockWidget(self.dockwidget)
             self.dockwidget = None
             
@@ -369,7 +385,7 @@ class QGisImajnetPlugin:
         ImajnetLog.info("** UNLOAD QGisImajnetPlugin")
 
         if self.pluginIsActive:
-            self.onClosePlugin()
+            self.onClosePlugin(False)
             
         for action in self.actions:
             self.iface.removePluginWebMenu(
@@ -398,7 +414,7 @@ class QGisImajnetPlugin:
         # IF SOMETHING SHALL BE MODIFIED BY USER THIS MUST BE HERE
         
         if self.pluginIsActive:
-            self.onClosePlugin()
+            self.onClosePlugin(True)
         else:
             self.pluginIsActive = True
 
@@ -469,15 +485,21 @@ class QGisImajnetPlugin:
     
     def enableImajnetMapTool(self, clickMode):
         ImajnetLog.info('enableImajnetMapTool')
-        self.imajnetMapTool.setClickMode(clickMode)
-        self.iface.mapCanvas().setMapTool(self.imajnetMapTool)
+        if self.imajnetMapTool is not None:
+             self.imajnetMapTool.setClickMode(clickMode)
+             self.iface.mapCanvas().setMapTool(self.imajnetMapTool)
         
     def on_debug_click(self):
         self.showOrHideDebugWindow()
     
     def on_disconnect_click(self):
         self.disableImajnetActions()
-        self.dockwidget.m_view.page().currentFrame().evaluateJavaScript("doLogout()")
+
+        # due to issue #34, logout is not working properly as qgis gets stuck. We replace the call with the cleanup 
+        # code + page reload which triggers the unload event that does the actual logout         
+        self.dockwidget.m_view.page().currentFrame().evaluateJavaScript("cleanupForLogout()")
+        self.dockwidget.m_view.reload()
+        #self.dockwidget.m_view.page().currentFrame().evaluateJavaScript("doLogout()")
         
     def on_help_click(self):
         QDesktopServices.openUrl(QUrl("https://imajnet.net/userguide/qgis/UG_IMAJNET_QGIS_{}.pdf".format(self.locale.upper()), QUrl.TolerantMode));

@@ -6,7 +6,7 @@ import datetime
 
 from PyQt5 import QtGui, QtWidgets, uic 
 from PyQt5.QtGui import QPainter
-from PyQt5.QtCore import pyqtSignal, QUrl, QObject, QVariant, QSize, QSettings,QBuffer, QRect
+from PyQt5.QtCore import pyqtSignal, QUrl, QObject, QVariant, QSize, QSettings,QBuffer, QRect, QEventLoop
 from PyQt5.QtSvg import QSvgGenerator
 from PyQt5.Qt import QFileInfo, pyqtSlot, QStringListModel, QHBoxLayout, \
     QPushButton
@@ -37,23 +37,10 @@ import inspect
 from .ImajnetLog import ImajnetLog
 
 #from .openlayers.imajnet import ImajnetTilesMapLayer
-#from .openlayers.ImajnetPluginLayerType import ImajnetPluginLayerType
 
 
 from .openlayers.openlayers_layer import ImajnetOpenlayersLayer
 
-class ImajnetPluginLayerType(QgsPluginLayerType):
-
-  def __init__(self, iface):
-    QgsPluginLayerType.__init__(self, ImajnetOpenlayersLayer.LAYER_TYPE)
-    self.iface = iface
-
-  def createLayer(self):
-    #ImajnetLog.error("ImajnetPluginLayerType createLayer called")
-    return ImajnetOpenlayersLayer(self.iface,PyImajnet.instance)
-
-  def showLayerProperties(self, layer):
-     return False
  
 class PyImajnet(QWidget):
 
@@ -69,10 +56,11 @@ class PyImajnet(QWidget):
     qgsProjectedLayers = []
     qgsPointProjectedLayers = []
     
-    def __init__(self, page, plugin, iface):
+    def __init__(self, view, plugin, iface):
         super(PyImajnet, self).__init__()
         self._layers=dict()
-        self._page = page
+        self._view=view
+        self._page = view.page()
         self._tileMapScaleLevels = TileMapScaleLevels()
         self._page.mainFrame().javaScriptWindowObjectCleared.connect(self.populateJavaScriptWindowObject)
         self.iface=iface
@@ -143,10 +131,10 @@ class PyImajnet(QWidget):
                 downloadedLayer = QgsVectorLayer(filename,os.path.basename(filename))
                 QgsProject.instance().addMapLayer(downloadedLayer)
         
-    def onPluginClose(self):
+    def onPluginClose(self,isUserAction=False):
         if self._layers is None:
             return
-        self.deactivateImajnet()
+        self.deactivateImajnet(isUserAction)
         self.iface.mapCanvas().scaleChanged.disconnect(self.mapScaleChanged) 
         self.iface.mapCanvas().layersChanged.disconnect(self.mapLayersChanged)
         QgsProject.instance().layerTreeRoot().layerOrderChanged.disconnect(self.mapLayersChanged)
@@ -758,7 +746,11 @@ class PyImajnet(QWidget):
         
     #TODO: hook up to projet opening
     def onProjectOpened(self):
-        self._page.currentFrame().evaluateJavaScript("onProjectOpened();")
+        # due to issue #34, deactivateImajnet is not working properly as qgis gets stuck. We replace the call with the cleanup 
+        # code + page reload which triggers the unload event that does the actual deactivateImajnet
+        self._page.currentFrame().evaluateJavaScript("ImajnetUrl.deleteUrlParams();")
+        self._view.reload()
+        #self._page.currentFrame().evaluateJavaScript("onProjectOpened();")
         # remove previously saved layer
         rootGroup = self.iface.layerTreeView().layerTreeModel().rootGroup()
         for layer in QgsProject.instance().mapLayers().values():
@@ -780,8 +772,25 @@ class PyImajnet(QWidget):
     def mapScaleChanged(self):
         self._page.currentFrame().evaluateJavaScript("onZoomEnd();")
         
-    def deactivateImajnet(self):
-        self._page.currentFrame().evaluateJavaScript("deactivateImajnet();")
+    def deactivateImajnet(self,isUserAction=False):
+        self._plugin.disableImajnetActions()
+        # due to issue #34, deactivateImajnet is not working properly as qgis gets stuck. We replace the call with the cleanup 
+        # code + page reload which triggers the unload event that does the actual deactivateImajnet
+        self._page.currentFrame().javaScriptWindowObjectCleared.disconnect(self.populateJavaScriptWindowObject)      
+        if not isUserAction:
+            synchronous = QEventLoop(self.parent())
+        
+            logoutNetworkAccessManager= QNetworkAccessManager()
+            logoutNetworkAccessManager.finished.connect(synchronous.quit)    
+            logoutNetworkAccessManager.setCookieJar(self.networkAccessManager.cookieJar())
+            logoutUrl = self._page.mainFrame().evaluateJavaScript("ImajnetProtocol.logoutUrl()")
+            logoutRequest = QNetworkRequest(QUrl(logoutUrl))
+        
+            reply = logoutNetworkAccessManager.get(logoutRequest);
+            synchronous.exec_();
+        
+        self._view.reload()      
+        #self._page.mainFrame().evaluateJavaScript("deactivateImajnet();")
         
     @pyqtSlot()
     def onImajnetDeactivated(self):
