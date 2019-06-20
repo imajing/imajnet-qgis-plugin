@@ -109,7 +109,7 @@ class QGisImajnetPluginDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         
         # -- load the local htm page
         # connect the script injection at page reload        
-        self._PyImajnet = PyImajnet(self.m_view.page(),self.imajnetPlugin, self.iface)
+        self._PyImajnet = PyImajnet(self.m_view,self.imajnetPlugin, self.iface)
         PyImajnet.instance = self._PyImajnet
         self._PyImajnet.networkAccessManager = manager
 
@@ -133,9 +133,9 @@ class QGisImajnetPluginDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.closingPlugin.emit()
         event.accept()
     
-    def cleanup(self):
+    def cleanup(self,isUserAction=False):
         if self._PyImajnet != None:
-            self._PyImajnet.onPluginClose()
+            self._PyImajnet.onPluginClose(isUserAction)
             self._PyImajnet = None       
 
     def askquestion(self):

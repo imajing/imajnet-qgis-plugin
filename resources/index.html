@@ -68,8 +68,8 @@
 <link rel="stylesheet" href="ImajnetLib/css/imajnetLibrary.css" />
 <script type="text/javascript" src="ImajnetLib/js/imajnetLibrary.js"></script>
 
-<!--
-<link rel="stylesheet" href="../imajnet-sdk/code/imajnet-sdk-javascript/css/login.css" /> 
+
+<!--<link rel="stylesheet" href="../imajnet-sdk/code/imajnet-sdk-javascript/css/login.css" /> 
  <link rel="stylesheet" href="../imajnet-sdk/code/imajnet-sdk-javascript/css/imajnet.css" /> 
  <link rel="stylesheet" href="../imajnet-sdk/code/imajnet-sdk-javascript/address/css/address.css" /> 
  <link rel="stylesheet" href="../imajnet-sdk/code/imajnet-sdk-javascript/LRS/css/LRS.css" />
@@ -125,7 +125,7 @@
 <script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/js/imajnetNews.js"></script>
 <script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/address/js/address.js"></script>
 <script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/LRS/js/LRS.js"></script>
-<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/LRS/js/LRSRequest.js"></script>
+<script type="text/javascript" src="../imajnet-sdk/code/imajnet-sdk-javascript/LRS/js/LRSRequest.js"></script>-->
 
 <!--DEV_END-->
 
@@ -179,7 +179,10 @@
 <link rel="stylesheet" href="css/imajnet_qgis.css" />
 <script src="js/imajnet_qgis.js"></script>
 </head>
-<body onload="ImajnetPlugin.activateImajnet();">
+
+<!--onunload event is necessary for handling the logout/plugin close/qgis close actions due to issue #34. 
+onunload works together with page reload events triggered from python and js cleanup code which is priorly executed -->
+<body onload="ImajnetPlugin.activateImajnet();" onunload="deactivateImajnet();">
 <!-- <body> -->
 	<div id="imajnetTabs">
 		<ul>

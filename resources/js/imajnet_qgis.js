@@ -128,9 +128,9 @@ ImajnetPlugin.showLogin = function (isFromIdle) {
 		}
 
 		var oldSettings = ImajnetPlugin.loadSettings().imajnetLoginSettings;
-		if (isFromIdle && settings.username === oldSettings.username && settings.password === oldSettings.password && settings.serverUrl === oldSettings.serverUrl) {
+		/*if (isFromIdle && settings.username === oldSettings.username && settings.password === oldSettings.password && settings.serverUrl === oldSettings.serverUrl) {
 			window.location.reload();
-		}
+		}*/
 
 		ImajnetPlugin.saveSettings(settings, {}, {});
 		ImajnetPlugin.activateImajnet();
@@ -256,6 +256,18 @@ ImajnetPlugin.imajnetLoginSuccess = function () {
 	PyImajnet.imajnetLoginSuccess(ImajnetUser.data);
 }
 
+
+function cleanupForLogout(keepSettings){
+	window.localStorage.clear(); //we keep localstorage in qgis
+	if (!keepSettings) {
+		var imajnetLoginSettings = ImajnetPlugin.loadSettings().imajnetLoginSettings;
+		delete imajnetLoginSettings.username;
+		delete imajnetLoginSettings.password;
+		ImajnetPlugin.saveSettings(imajnetLoginSettings, {}, {});
+	}
+	//ImajnetUrl.deleteUrlParams();
+}
+
 /**
  * Deactivates the imajnet plugin
  * 
@@ -267,13 +279,7 @@ function doLogout(keepSettings, isFromIdle) {
 		onProjectSaving();
 	}
 	deactivateImajnet().done(function () {
-		window.localStorage.clear(); //we keep localstorage in qgis
-		if (!keepSettings) {
-			var imajnetLoginSettings = ImajnetPlugin.loadSettings().imajnetLoginSettings;
-			delete imajnetLoginSettings.username;
-			delete imajnetLoginSettings.password;
-			ImajnetPlugin.saveSettings(imajnetLoginSettings, {}, {});
-		}
+		cleanupForLogout(keepSettings);
 		ImajnetUrl.deleteUrlParams();
 		if (isFromIdle) {
 			ImajnetPlugin.showLogin(isFromIdle);
