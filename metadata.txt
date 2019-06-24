@@ -8,7 +8,7 @@
 
 [general]
 name=Imajnet QGIS 
-qgisMinimumVersion=3.0
+qgisMinimumVersion=3.6
 description=Imajnet QGIS
 version=V.X
 author=Imajing sas
