@@ -22,7 +22,7 @@
 # Edit the following to match your sources lists
 #################################################
 
-VERSION=1.0.2
+VERSION=1.0.3
 VERSION_PATTERN='s/version=V.X/version=$(VERSION)/g'
 BUILD_DATE=`date +'%y-%m-%d %H:%M'`
 BUILD_DATE_FILE=`date +'%y-%m-%d_%H_%M'`
