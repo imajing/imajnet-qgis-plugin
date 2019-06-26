@@ -185,7 +185,7 @@ upload: zip
 	@echo "-------------------------------------"
 	@echo "Uploading plugin to QGIS Plugin repo."
 	@echo "-------------------------------------"
-	$(PLUGIN_UPLOAD) --username $(OS_GEO_UID) --password $(OS_GEO_PASSWORD) $(BUILD_DIR)/$(PLUGINNAME)_$(VERSION)_$(BUILD_DATE_FILE).zip
+	$(PLUGIN_UPLOAD) --username=$(OS_GEO_UID) --password=$(OS_GEO_PASSWORD) $(BUILD_DIR)/$(PLUGINNAME)_$(VERSION)_$(BUILD_DATE_FILE).zip
 
 transup:
 	@echo
