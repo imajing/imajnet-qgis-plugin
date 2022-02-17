@@ -409,7 +409,7 @@ class PyImajnet(QWidget):
         if (markerLayer is not None):
             self.highlightMarker(featureWrapper)
         else:
-            layer = QgsProject.instance().mapLayer(layerName)
+            layer = QgsProject.instance().mapLayer(layerName if isinstance(layerName, str) else layerName.toString())
             if layer is None:
                 return
             layer.select(featureWrapper["feature"])

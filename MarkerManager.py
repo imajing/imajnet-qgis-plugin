@@ -174,7 +174,7 @@ class MarkerManager(QObject):
             marker.setToGeometry(geom, None)
             marker.closePoints()
         else:
-            geom = ImajnetUtils.convertJsPointsArrayToPolyline(self._canvas,pointsArray)
+            geom = ImajnetUtils.convertJsPointsArrayToPolyline(self._canvas,pointsArray, True)
             marker.setToGeometry(geom, None)
             
      
